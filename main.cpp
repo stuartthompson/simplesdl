@@ -31,17 +31,25 @@ int main( int argc, char* args[] )
 		}
 		else
 		{
-			// Set render color
-			SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    
-			// Draw a point
-			SDL_RenderDrawPoint(renderer, 100, 100);
+			// Refresh 255 times
+			for (int col = 0; col < 255; col++) {
+				// Set render color
+				SDL_SetRenderDrawColor(renderer, col, 0, 0, 255);
 
-			// Render
-			SDL_RenderPresent(renderer);
+				// Draw a line using points
+				for (int x = 100; x < 500; x++) {
+					SDL_RenderDrawPoint(renderer, x, col);
+				}
 
-			// Wait a few seconds
-			SDL_Delay( 5000 );
+				// Render
+				SDL_RenderPresent(renderer);
+
+				// Wait a few milliseconds
+				SDL_Delay(50);
+			}
+
+			// Wait a second
+			SDL_Delay( 1000 );
 		}
 	}
 
