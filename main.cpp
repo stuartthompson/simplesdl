@@ -6,38 +6,53 @@ and may not be redistributed without written permission.*/
 #include <stdio.h>
 
 // Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 800;
+const int SCREEN_HEIGHT = 600;
 
-int main( int argc, char* args[] )
+int main(int argc, char *args[])
 {
 	// Window and renderer
-	SDL_Window* window = NULL;
-	SDL_Renderer* renderer = NULL;
+	SDL_Window *window = NULL;
+	SDL_Renderer *renderer = NULL;
+
+	SDL_Texture *texture = NULL;
 
 	// Initialize SDL
-	if( SDL_Init( SDL_INIT_VIDEO ) < 0 )
+	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
-		printf( "SDL could not initialize! SDL_Error: %s\n", SDL_GetError() );
+		printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
 	}
 	else
 	{
 		// Create window and get renderer
-		SDL_CreateWindowAndRenderer(800, 600, 0, &window, &renderer);
+		SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, &window, &renderer);
 
-		if( window == NULL )
+		// Create a texture to draw to
+		SDL_Texture* buffer = SDL_CreateTexture(renderer,
+                           SDL_PIXELFORMAT_BGRA8888,
+                           SDL_TEXTUREACCESS_STREAMING, 
+                           SCREEN_WIDTH,
+                           SCREEN_HEIGHT);
+
+		if (window == NULL)
 		{
-			printf( "Window could not be created! SDL_Error: %s\n", SDL_GetError() );
+			printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
 		}
 		else
 		{
-			// Refresh 255 times
-			for (int col = 0; col < 255; col++) {
+			// Draw 255 "frames"
+			for (int col = 0; col < 255; col++)
+			{
+				// Clear screen
+				SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+				SDL_RenderClear(renderer);
+
 				// Set render color
 				SDL_SetRenderDrawColor(renderer, col, 0, 0, 255);
 
 				// Draw a line using points
-				for (int x = 100; x < 500; x++) {
+				for (int x = 100; x < 500; x++)
+				{
 					SDL_RenderDrawPoint(renderer, x, col);
 				}
 
@@ -45,16 +60,16 @@ int main( int argc, char* args[] )
 				SDL_RenderPresent(renderer);
 
 				// Wait a few milliseconds
-				SDL_Delay(50);
+				SDL_Delay(1);
 			}
 
 			// Wait a second
-			SDL_Delay( 1000 );
+			SDL_Delay(1000);
 		}
 	}
 
 	// Destroy window
-	SDL_DestroyWindow( window );
+	SDL_DestroyWindow(window);
 
 	// Quit SDL subsystems
 	SDL_Quit();
