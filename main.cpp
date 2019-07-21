@@ -4,6 +4,7 @@ and may not be redistributed without written permission.*/
 //Using SDL and standard IO
 #include <SDL.h>
 #include <stdio.h>
+#include <cstdlib>
 
 // Screen dimension constants
 const int SCREEN_WIDTH = 800;
@@ -21,63 +22,84 @@ void drawLine(SDL_Renderer *renderer, SDL_Point from, SDL_Point to, SDL_Color co
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 
 	// Figure out whether x or y is covering more distance (i.e is the slope more horizontal or vertical)
-	float dx, dy = 0;
-	float fromx, tox;
-	if (from.x > to.x)
-	{
-		fromx = to.x; // Ensure we're drawing left to right
-		tox = from.x;
-		dx = from.x - to.x;
-	}
-	else
-	{
-		fromx = from.x;
-		tox = to.x;
-		dx = to.x - from.x;
-	}
-	int fromy, toy;
-	if (from.y > to.y)
-	{
-		fromy = to.y;
-		toy = from.y;
-		dy = from.y - to.y;
-	}
-	else
-	{
-		fromy = from.y;
-		toy = to.y;
-		dy = to.y - from.y;
-	}
+	float dx = from.x - to.x;
+	float dy = from.y - to.y;
 
 	// Determine the slope of the line (i.e. vector 3,9 has slope 1/3 (or y/x == 9/3))
 	float x, y;
 
 	// Horizontal and vertical lines are plotted differently
-	if (dx == 0)
+	if (dx == 0) // Vertical line
 	{
-		for (y = fromy; y <= toy; y++)
+		if (from.y <= to.y) // Line is drawn top to bottom so have to increment from to (origin is top-left in SDL)
 		{
-			SDL_RenderDrawPoint(renderer, fromx, y);
+			for (y = from.y; y <= to.y; y++)
+			{
+				SDL_RenderDrawPoint(renderer, from.x, y);
+			}
+		}
+		else
+		// Line is drawn bottom to top so have to decrement from to (origin is top-left in SDL)
+		{
+			for (y = from.y; y >= to.y; y--)
+			{
+				SDL_RenderDrawPoint(renderer, from.x, y);
+			}
 		}
 	}
-	else if (dy == 0)
+	else if (dy == 0) // Horizontal line
 	{
-		for (x = fromx; x <= tox; x++)
+		if (from.x <= to.x) // Line is drawn left to right so have to increment from to (origin is top-left in SDL)
 		{
-			SDL_RenderDrawPoint(renderer, x, fromy);
+			for (x = from.x; x <= to.x; x++)
+			{
+				SDL_RenderDrawPoint(renderer, x, from.y);
+			}
+		}
+		else // Line is drawn right to left so have to decrement from to (origin is top-left in SDL)
+		{
+			for (x = from.x; x >= to.x; x--)
+			{
+				SDL_RenderDrawPoint(renderer, x, from.y);
+			}
 		}
 	}
+	// Sloped line
 	else
 	{
 		// Determine the slope of the line (i.e. vector 3,9 has slope 1/3 (or y/x == 9/3))
-		float slope = dx / dy;
+		float slope = dy / dx;
 
 		// Plot for integer values of x
-		for (x = fromx; x <= tox; x++)
+		// Find quadrant
+		if (from.x <= to.x) // Line is moving to the right
 		{
-			y = (slope * (x - fromx)) + fromy; // Plot the point using y = mx + c
-			SDL_RenderDrawPoint(renderer, x, y);
+			for (x = from.x; x <= to.x; x++)
+			{
+				y = (slope * (x - from.x)) + from.y; // Plot the point using y = mx + c
+				SDL_RenderDrawPoint(renderer, x, y);
+			}
 		}
+		else // Line is moving to the left
+		{
+			for (x = from.x; x >= to.x; x--)
+			{
+				y = (slope * (x - from.x)) + from.y; // Plot the point using y = mx + c
+				SDL_RenderDrawPoint(renderer, x, y);
+			}
+		}
+		
+	}
+}
+
+void drawPlane(SDL_Renderer *renderer, SDL_Point from, SDL_Point to, SDL_Color color, bool showNormal)
+{
+	//drawLine(renderer, from, to, color);
+	if (showNormal)
+	{
+		// Find line mid-point
+		// Find line at 90 degree angle
+		// Draw line
 	}
 }
 
@@ -153,6 +175,51 @@ void renderUsingTexture(SDL_Renderer *renderer, SDL_Texture *texture)
 	}
 }
 
+// Tests the drawline function by plotting some axis and different slope lines in all quadrants
+void testDrawLine(SDL_Renderer *renderer)
+{
+	clearScreen(renderer);
+
+	drawLine(renderer, {100, 100}, {200, 100}, {255, 0, 0, 255}); // + x-axis
+	drawLine(renderer, {100, 100}, {100, 0}, {0, 255, 0, 255});   // + y-axis
+	drawLine(renderer, {100, 100}, {0, 100}, {255, 0, 0, 255});   // - x-axis
+	drawLine(renderer, {100, 100}, {100, 200}, {0, 255, 0, 255}); // - y-axis
+
+	drawLine(renderer, {100, 100}, {200, 0}, {0, 0, 255, 255}); // - up and right (at 1:30 on a clock face)
+	drawLine(renderer, {100, 100}, {200, 200}, {0, 0, 255, 255}); // - down and right (at 4:30 on a clock face)
+	drawLine(renderer, {100, 100}, {0, 200}, {0, 0, 255, 255}); // - down and left (at 7:30 on a clock face)
+	drawLine(renderer, {100, 100}, {0, 0}, {0, 0, 255, 255}); // - up and left (at 10:30 on a clock face)
+
+	drawLine(renderer, {100, 100}, {150, 0}, {255, 0, 255, 255}); // - up and right (at 1:00 on a clock face)
+	drawLine(renderer, {100, 100}, {200, 50}, {255, 0, 255, 255}); // - up and right (at 3:00 on a clock face)
+	drawLine(renderer, {100, 100}, {200, 150}, {255, 0, 255, 255}); // - down and right (at 4:00 on a clock face)
+	drawLine(renderer, {100, 100}, {150, 200}, {255, 0, 255, 255}); // - down and right (at 5:00 on a clock face)
+	drawLine(renderer, {100, 100}, {50, 200}, {255, 0, 255, 255}); // - down and left (at 7:00 on a clock face)
+	drawLine(renderer, {100, 100}, {0, 150}, {255, 0, 255, 255}); // - down and left (at 8:00 on a clock face)
+	drawLine(renderer, {100, 100}, {0, 50}, {255, 0, 255, 255}); // - up and left (at 10:00 on a clock face)
+	drawLine(renderer, {100, 100}, {50, 0}, {255, 0, 255, 255}); // - up and left (at 11:00 on a clock face)
+	
+	drawLine(renderer, {100, 100}, {125, 0}, {255, 255, 196, 255}); // something like 12:30
+	drawLine(renderer, {100, 100}, {200, 75}, {255, 255, 196, 255}); // something like 2:30
+	drawLine(renderer, {100, 100}, {200, 125}, {255, 255, 196, 255}); // something like 3:30
+	drawLine(renderer, {100, 100}, {125, 200}, {255, 255, 196, 255}); // something like 5:30
+	drawLine(renderer, {100, 100}, {75, 200}, {255, 255, 196, 255}); // something like 6:30
+	drawLine(renderer, {100, 100}, {0, 125}, {255, 255, 196, 255}); // something like 8:30
+	drawLine(renderer, {100, 100}, {0, 75}, {255, 255, 196, 255}); // something like 9:30
+	drawLine(renderer, {100, 100}, {75, 0}, {255, 255, 196, 255}); // something like 11:30
+
+	// Render
+	SDL_RenderPresent(renderer);
+}
+
+void testDrawPlane(SDL_Renderer *renderer)
+{
+	clearScreen(renderer);
+
+	// Render
+	SDL_RenderPresent(renderer);
+}
+
 int main(int argc, char *args[])
 {
 	// Window and renderer
@@ -171,7 +238,7 @@ int main(int argc, char *args[])
 		// Create window and get renderer
 		SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, &window, &renderer);
 
-		// Create a texture to draw to
+		// Create a texture to draw to slope
 		texture =
 			SDL_CreateTexture(
 				renderer,
@@ -192,16 +259,10 @@ int main(int argc, char *args[])
 			// Render some frames using a texture
 			//renderUsingTexture(renderer, texture);
 
-			clearScreen(renderer);
+			// Test drawLine
+			testDrawLine(renderer);
 
-			drawLine(renderer, {100, 200}, {200, 200}, {255, 0, 0, 255});   // x-axis
-			drawLine(renderer, {100, 100}, {100, 200}, {0, 255, 0, 255});   // y-axis
-			drawLine(renderer, {100, 200}, {150, 250}, {0, 0, 255, 255});   // slope = 1
-			drawLine(renderer, {100, 200}, {110, 250}, {255, 0, 255, 255}); // slope < 1
-			drawLine(renderer, {100, 200}, {190, 250}, {0, 255, 255, 255}); // slope > 1
-
-			// Render
-			SDL_RenderPresent(renderer);
+			//testDrawPlane(renderer);
 
 			// Wait a second
 			SDL_Delay(5000);
