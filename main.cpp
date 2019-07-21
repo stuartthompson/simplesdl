@@ -10,6 +10,8 @@ and may not be redistributed without written permission.*/
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 
+const double PI = 3.14159265358979323846;
+
 void clearScreen(SDL_Renderer *renderer)
 {
 	// Clear screen
@@ -90,6 +92,30 @@ void drawLine(SDL_Renderer *renderer, SDL_Point from, SDL_Point to, SDL_Color co
 		}
 		
 	}
+}
+
+// Draws a line from a given point using an angle and a line length
+void drawLineAtAngle(SDL_Renderer *renderer, SDL_Point from, float angle, float length, SDL_Color color) {
+	// Given the angle and hypotenuse, calculate the height and width of the triangle
+	// sin (angle) = width / hypotenuse (soh)
+	// width = hypotenuse * sin(angle)
+
+	// Convert angle to radians
+	float angleInRadians = angle * (PI / 180);
+
+	float width = length * sin(angleInRadians);
+	float height = length * cos(angleInRadians);
+
+	// The "to" point is just the from point with height and width added
+	SDL_Point to = {from.x + (int)width, from.y + (int)height};
+	drawLine(renderer, from, to, color);
+}
+
+float calcLineLength(SDL_Point from, SDL_Point to) {
+	// c = sqrt(a^2 + b^2)
+	float dx = std::abs(from.x - to.x);
+	float dy = std::abs(from.y - to.y);
+	return sqrt(dx*dx + dy*dy);
 }
 
 void drawPlane(SDL_Renderer *renderer, SDL_Point from, SDL_Point to, SDL_Color color, bool showNormal)
@@ -207,6 +233,8 @@ void testDrawLine(SDL_Renderer *renderer)
 	drawLine(renderer, {100, 100}, {0, 125}, {255, 255, 196, 255}); // something like 8:30
 	drawLine(renderer, {100, 100}, {0, 75}, {255, 255, 196, 255}); // something like 9:30
 	drawLine(renderer, {100, 100}, {75, 0}, {255, 255, 196, 255}); // something like 11:30
+
+	drawLineAtAngle(renderer, {300, 300}, 135, 75, {255, 255, 255, 255});
 
 	// Render
 	SDL_RenderPresent(renderer);
