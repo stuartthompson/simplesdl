@@ -5,6 +5,7 @@ and may not be redistributed without written permission.*/
 #include <SDL.h>
 #include <stdio.h>
 #include <cstdlib>
+#include <chrono>
 
 // Screen dimension constants
 const int SCREEN_WIDTH = 800;
@@ -299,7 +300,7 @@ void drawClock(
 	float hourHandAngle = 180 - (hours * (360 / 12));
 	// Adjust hour handle angle for partial hour
 	float percentThroughHour = (float)minutes / (float)60;
-	hourHandAngle = hourHandAngle - ((360/12)* percentThroughHour);
+	hourHandAngle = hourHandAngle - ((360 / 12) * percentThroughHour);
 	drawLineAtAngle(renderer, origin, hourHandAngle, hourHandLength, hourHandColor);
 	float minuteHandAngle = 180 - (minutes * (360 / 60));
 	drawLineAtAngle(renderer, origin, minuteHandAngle, minuteHandLength, minuteHandColor);
@@ -309,7 +310,7 @@ void testDrawPlane(SDL_Renderer *renderer)
 {
 }
 
-void renderFrame(SDL_Renderer *renderer)
+void renderFrame(SDL_Renderer *renderer, int currentTime)
 {
 	// Clear screen
 	clearScreen(renderer);
@@ -321,12 +322,19 @@ void renderFrame(SDL_Renderer *renderer)
 	drawCircle(renderer, {300, 100}, 50, {255, 255, 128, 255});
 
 	// Draw clock
-	drawClock(renderer, {400, 400}, 75, 8, 40, 55, 2, 22, COLOR_YELLOW, COLOR_GRAY, COLOR_CYAN, COLOR_RED);
+	int hours = currentTime / 60;
+	int minutes = currentTime - (hours * 60);
+	drawClock(renderer, {400, 400}, 75, 8, 40, 55, hours, minutes, COLOR_YELLOW, COLOR_GRAY, COLOR_CYAN, COLOR_RED);
 
 	//testDrawPlane(renderer);
 
 	// Render
 	SDL_RenderPresent(renderer);
+}
+
+uint64_t timeSinceEpochMillisec() {
+  using namespace std::chrono;
+  return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 }
 
 int main(int argc, char *args[])
@@ -336,6 +344,14 @@ int main(int argc, char *args[])
 	SDL_Renderer *renderer = NULL;
 
 	SDL_Texture *texture = NULL;
+	SDL_Event event;
+
+	bool quitting = false;
+
+	int currentTimeVelocity = 0;
+	int currentTime = (2*60) + 22;
+
+	uint64_t lastTick = timeSinceEpochMillisec();
 
 	// Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -362,24 +378,65 @@ int main(int argc, char *args[])
 		}
 		else
 		{
-			// Render some frames drawing lines
-			//pixelLineRenderLoop(renderer);
+			while (!quitting)
+			{
+				// Game logic
+				// Increment current time (only if not incremented in last 100ms)
+				uint64_t now = timeSinceEpochMillisec();
+				if (now - lastTick > 50) {
+					currentTime += currentTimeVelocity;
+					lastTick = now;
+				}
 
-			// Render some frames using a texture
-			//renderUsingTexture(renderer, texture);
+				// Render current frame
+				renderFrame(renderer, currentTime);
 
-			renderFrame(renderer);
+				// Check for input
+				while (SDL_PollEvent(&event))
+				{
+					switch (event.type)
+					{
+					case SDL_KEYDOWN:
+						switch (event.key.keysym.sym)
+						{
+						case SDLK_q:
+							quitting = true;
+							break;
+						case SDLK_UP:
+							currentTimeVelocity = 1;
+							break;
+						case SDLK_DOWN:
+							currentTimeVelocity = -1;
+							break;
+						default:
+							break;
+						}
+						break;
+					case SDL_KEYUP:
+						switch (event.key.keysym.sym)
+						{
+						case SDLK_UP:
+							if (currentTimeVelocity > 0)
+								currentTimeVelocity = 0;
+							break;
+						case SDLK_DOWN:
+							if (currentTimeVelocity < 0)
+								currentTimeVelocity = 0;
+							break;
+						default:
+							break;
+						}
+					}
+				}
+			}
 
-			// Wait a second
-			SDL_Delay(5000);
+			// Destroy window
+			SDL_DestroyWindow(window);
+
+			// Quit SDL subsystems
+			SDL_Quit();
+
+			return 0;
 		}
 	}
-
-	// Destroy window
-	SDL_DestroyWindow(window);
-
-	// Quit SDL subsystems
-	SDL_Quit();
-
-	return 0;
 }
