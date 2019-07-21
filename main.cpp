@@ -12,6 +12,49 @@ const int SCREEN_HEIGHT = 600;
 
 const double PI = 3.14159265358979323846;
 
+const SDL_Color COLOR_RED = {255, 0, 0, 255};
+const SDL_Color COLOR_BLUE = {0, 255, 0, 255};
+const SDL_Color COLOR_GREEN = {0, 0, 255, 255};
+const SDL_Color COLOR_PURPLE = {255, 0, 255, 255};
+const SDL_Color COLOR_YELLOW = {255, 255, 0, 255};
+const SDL_Color COLOR_CYAN = {0, 255, 255, 255};
+const SDL_Color COLOR_GRAY = {128, 128, 128, 255};
+const SDL_Color COLOR_WHITE = {255, 255, 255, 255};
+
+float degreesToRadians(float degrees)
+{
+	return degrees * (PI / 180);
+}
+
+float radiansToDegrees(float radians)
+{
+	return radians * (180 / PI);
+}
+
+// calculates the end-point of a vector expressed as an origin, angle, and magnitude
+SDL_Point calcEndpoint(SDL_Point origin, float angle, float magnitude)
+{
+	// Given the angle and hypotenuse, calculate the height and width of the triangle
+	// sin(angle) = width / hypotenuse (soh)      therefore: width = hypotenuse * sin(angle)
+	// cos(angle) = width / hypotenuse (cah)      therefore: height = hypotenuse * cos(angle)
+
+	// Degrees to radians is    rad = deg * (PI/180)
+	float angleInRadians = angle * (PI / 180);
+
+	float width = magnitude * sin(angleInRadians);
+	float height = magnitude * cos(angleInRadians);
+
+	return {origin.x + (int)width, origin.y + (int)height};
+}
+
+float calcLineLength(SDL_Point from, SDL_Point to)
+{
+	// c = sqrt(a^2 + b^2)   (pythagorean theorem)
+	float dx = std::abs(from.x - to.x);
+	float dy = std::abs(from.y - to.y);
+	return sqrt(dx * dx + dy * dy);
+}
+
 void clearScreen(SDL_Renderer *renderer)
 {
 	// Clear screen
@@ -90,32 +133,38 @@ void drawLine(SDL_Renderer *renderer, SDL_Point from, SDL_Point to, SDL_Color co
 				SDL_RenderDrawPoint(renderer, x, y);
 			}
 		}
-		
 	}
 }
 
 // Draws a line from a given point using an angle and a line length
-void drawLineAtAngle(SDL_Renderer *renderer, SDL_Point from, float angle, float length, SDL_Color color) {
+void drawLineAtAngle(SDL_Renderer *renderer, SDL_Point from, float angle, float length, SDL_Color color)
+{
 	// Given the angle and hypotenuse, calculate the height and width of the triangle
 	// sin (angle) = width / hypotenuse (soh)
 	// width = hypotenuse * sin(angle)
 
 	// Convert angle to radians
-	float angleInRadians = angle * (PI / 180);
+	float radians = degreesToRadians(angle);
 
-	float width = length * sin(angleInRadians);
-	float height = length * cos(angleInRadians);
+	float width = length * sin(radians);
+	float height = length * cos(radians);
 
 	// The "to" point is just the from point with height and width added
-	SDL_Point to = {from.x + (int)width, from.y + (int)height};
+	//SDL_Point to = {from.x + (int)width, from.y + (int)height};
+
+	SDL_Point to = calcEndpoint(from, angle, length);
 	drawLine(renderer, from, to, color);
 }
 
-float calcLineLength(SDL_Point from, SDL_Point to) {
-	// c = sqrt(a^2 + b^2)
-	float dx = std::abs(from.x - to.x);
-	float dy = std::abs(from.y - to.y);
-	return sqrt(dx*dx + dy*dy);
+void drawCircle(SDL_Renderer *renderer, SDL_Point center, float radius, SDL_Color color)
+{
+	// Loop through 360 degrees
+	for (int deg = 0; deg < 360; deg++)
+	{
+		SDL_Point point = calcEndpoint(center, deg, radius);
+		SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+		SDL_RenderDrawPoint(renderer, point.x, point.y);
+	}
 }
 
 void drawPlane(SDL_Renderer *renderer, SDL_Point from, SDL_Point to, SDL_Color color, bool showNormal)
@@ -204,45 +253,77 @@ void renderUsingTexture(SDL_Renderer *renderer, SDL_Texture *texture)
 // Tests the drawline function by plotting some axis and different slope lines in all quadrants
 void testDrawLine(SDL_Renderer *renderer)
 {
-	clearScreen(renderer);
-
+	// Draw clock lines (with hand-crafted coordinates; note: line lengths are wrong)
 	drawLine(renderer, {100, 100}, {200, 100}, {255, 0, 0, 255}); // + x-axis
 	drawLine(renderer, {100, 100}, {100, 0}, {0, 255, 0, 255});   // + y-axis
 	drawLine(renderer, {100, 100}, {0, 100}, {255, 0, 0, 255});   // - x-axis
 	drawLine(renderer, {100, 100}, {100, 200}, {0, 255, 0, 255}); // - y-axis
 
-	drawLine(renderer, {100, 100}, {200, 0}, {0, 0, 255, 255}); // - up and right (at 1:30 on a clock face)
+	drawLine(renderer, {100, 100}, {200, 0}, {0, 0, 255, 255});   // - up and right (at 1:30 on a clock face)
 	drawLine(renderer, {100, 100}, {200, 200}, {0, 0, 255, 255}); // - down and right (at 4:30 on a clock face)
-	drawLine(renderer, {100, 100}, {0, 200}, {0, 0, 255, 255}); // - down and left (at 7:30 on a clock face)
-	drawLine(renderer, {100, 100}, {0, 0}, {0, 0, 255, 255}); // - up and left (at 10:30 on a clock face)
+	drawLine(renderer, {100, 100}, {0, 200}, {0, 0, 255, 255});   // - down and left (at 7:30 on a clock face)
+	drawLine(renderer, {100, 100}, {0, 0}, {0, 0, 255, 255});	 // - up and left (at 10:30 on a clock face)
 
-	drawLine(renderer, {100, 100}, {150, 0}, {255, 0, 255, 255}); // - up and right (at 1:00 on a clock face)
-	drawLine(renderer, {100, 100}, {200, 50}, {255, 0, 255, 255}); // - up and right (at 3:00 on a clock face)
+	drawLine(renderer, {100, 100}, {150, 0}, {255, 0, 255, 255});   // - up and right (at 1:00 on a clock face)
+	drawLine(renderer, {100, 100}, {200, 50}, {255, 0, 255, 255});  // - up and right (at 3:00 on a clock face)
 	drawLine(renderer, {100, 100}, {200, 150}, {255, 0, 255, 255}); // - down and right (at 4:00 on a clock face)
 	drawLine(renderer, {100, 100}, {150, 200}, {255, 0, 255, 255}); // - down and right (at 5:00 on a clock face)
-	drawLine(renderer, {100, 100}, {50, 200}, {255, 0, 255, 255}); // - down and left (at 7:00 on a clock face)
-	drawLine(renderer, {100, 100}, {0, 150}, {255, 0, 255, 255}); // - down and left (at 8:00 on a clock face)
-	drawLine(renderer, {100, 100}, {0, 50}, {255, 0, 255, 255}); // - up and left (at 10:00 on a clock face)
-	drawLine(renderer, {100, 100}, {50, 0}, {255, 0, 255, 255}); // - up and left (at 11:00 on a clock face)
-	
-	drawLine(renderer, {100, 100}, {125, 0}, {255, 255, 196, 255}); // something like 12:30
-	drawLine(renderer, {100, 100}, {200, 75}, {255, 255, 196, 255}); // something like 2:30
+	drawLine(renderer, {100, 100}, {50, 200}, {255, 0, 255, 255});  // - down and left (at 7:00 on a clock face)
+	drawLine(renderer, {100, 100}, {0, 150}, {255, 0, 255, 255});   // - down and left (at 8:00 on a clock face)
+	drawLine(renderer, {100, 100}, {0, 50}, {255, 0, 255, 255});	// - up and left (at 10:00 on a clock face)
+	drawLine(renderer, {100, 100}, {50, 0}, {255, 0, 255, 255});	// - up and left (at 11:00 on a clock face)
+
+	drawLine(renderer, {100, 100}, {125, 0}, {255, 255, 196, 255});   // something like 12:30
+	drawLine(renderer, {100, 100}, {200, 75}, {255, 255, 196, 255});  // something like 2:30
 	drawLine(renderer, {100, 100}, {200, 125}, {255, 255, 196, 255}); // something like 3:30
 	drawLine(renderer, {100, 100}, {125, 200}, {255, 255, 196, 255}); // something like 5:30
-	drawLine(renderer, {100, 100}, {75, 200}, {255, 255, 196, 255}); // something like 6:30
-	drawLine(renderer, {100, 100}, {0, 125}, {255, 255, 196, 255}); // something like 8:30
-	drawLine(renderer, {100, 100}, {0, 75}, {255, 255, 196, 255}); // something like 9:30
-	drawLine(renderer, {100, 100}, {75, 0}, {255, 255, 196, 255}); // something like 11:30
+	drawLine(renderer, {100, 100}, {75, 200}, {255, 255, 196, 255});  // something like 6:30
+	drawLine(renderer, {100, 100}, {0, 125}, {255, 255, 196, 255});   // something like 8:30
+	drawLine(renderer, {100, 100}, {0, 75}, {255, 255, 196, 255});	// something like 9:30
+	drawLine(renderer, {100, 100}, {75, 0}, {255, 255, 196, 255});	// something like 11:30
+}
 
-	drawLineAtAngle(renderer, {300, 300}, 135, 75, {255, 255, 255, 255});
-
-	// Render
-	SDL_RenderPresent(renderer);
+void drawClock(
+	SDL_Renderer *renderer, SDL_Point origin, int radius, int hourMarkerLength, int hourHandLength,
+	int minuteHandLength, int hours, int minutes, SDL_Color borderColor, SDL_Color markerColor, SDL_Color hourHandColor, SDL_Color minuteHandColor)
+{
+	drawCircle(renderer, origin, radius, borderColor);
+	// Draw hour markers
+	for (float hour = 0; hour < 12; hour++)
+	{
+		float angle = 180 - ((360 / 12) * hour);											// Add 360/12 degrees each increment (1 marker per hour)
+		SDL_Point hourMarkerStart = calcEndpoint(origin, angle, radius - hourMarkerLength); // Calculate where hour marker line begins for this hour
+		drawLineAtAngle(renderer, hourMarkerStart, angle, hourMarkerLength, markerColor);
+	}
+	// Draw hands
+	float hourHandAngle = 180 - (hours * (360 / 12));
+	// Adjust hour handle angle for partial hour
+	float percentThroughHour = (float)minutes / (float)60;
+	hourHandAngle = hourHandAngle - ((360/12)* percentThroughHour);
+	drawLineAtAngle(renderer, origin, hourHandAngle, hourHandLength, hourHandColor);
+	float minuteHandAngle = 180 - (minutes * (360 / 60));
+	drawLineAtAngle(renderer, origin, minuteHandAngle, minuteHandLength, minuteHandColor);
 }
 
 void testDrawPlane(SDL_Renderer *renderer)
 {
+}
+
+void renderFrame(SDL_Renderer *renderer)
+{
+	// Clear screen
 	clearScreen(renderer);
+
+	// Test drawLine
+	testDrawLine(renderer);
+
+	// Draw a circle
+	drawCircle(renderer, {300, 100}, 50, {255, 255, 128, 255});
+
+	// Draw clock
+	drawClock(renderer, {400, 400}, 75, 8, 40, 55, 2, 22, COLOR_YELLOW, COLOR_GRAY, COLOR_CYAN, COLOR_RED);
+
+	//testDrawPlane(renderer);
 
 	// Render
 	SDL_RenderPresent(renderer);
@@ -287,10 +368,7 @@ int main(int argc, char *args[])
 			// Render some frames using a texture
 			//renderUsingTexture(renderer, texture);
 
-			// Test drawLine
-			testDrawLine(renderer);
-
-			//testDrawPlane(renderer);
+			renderFrame(renderer);
 
 			// Wait a second
 			SDL_Delay(5000);
