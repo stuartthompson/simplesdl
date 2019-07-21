@@ -116,11 +116,20 @@ void drawLine(SDL_Renderer *renderer, SDL_Point from, SDL_Point to, SDL_Color co
 		// Determine the slope of the line (i.e. vector 3,9 has slope 1/3 (or y/x == 9/3))
 		float slope = dy / dx;
 
+		// Draw more than one segment per x-pixel if slope is greater than 1 or less than -1 (fills in near-vertical lines)
+		float xInc = 1;
+		if (slope > 1) {
+			xInc = 1 / slope;
+		}
+		if (slope < -1) {
+			xInc = -1 / slope;
+		}
+
 		// Plot for integer values of x
 		// Find quadrant
 		if (from.x <= to.x) // Line is moving to the right
 		{
-			for (x = from.x; x <= to.x; x++)
+			for (x = from.x; x <= to.x; x+=xInc)
 			{
 				y = (slope * (x - from.x)) + from.y; // Plot the point using y = mx + c
 				SDL_RenderDrawPoint(renderer, x, y);
@@ -128,7 +137,7 @@ void drawLine(SDL_Renderer *renderer, SDL_Point from, SDL_Point to, SDL_Color co
 		}
 		else // Line is moving to the left
 		{
-			for (x = from.x; x >= to.x; x--)
+			for (x = from.x; x >= to.x; x-=xInc)
 			{
 				y = (slope * (x - from.x)) + from.y; // Plot the point using y = mx + c
 				SDL_RenderDrawPoint(renderer, x, y);
@@ -179,35 +188,6 @@ void drawPlane(SDL_Renderer *renderer, SDL_Point from, SDL_Point to, SDL_Color c
 	}
 }
 
-void drawLineWithPixels(SDL_Renderer *renderer, int xFrom, int xTo, int colorRed)
-{
-	// Set render color
-	SDL_SetRenderDrawColor(renderer, colorRed, 0, 0, 255);
-
-	// Draw a line using points
-	for (int x = xFrom; x < xTo; x++)
-	{
-		SDL_RenderDrawPoint(renderer, x, 200);
-	}
-}
-
-void pixelLineRenderLoop(SDL_Renderer *renderer)
-{
-	// Draw 255 "frames"
-	for (int col = 0; col < 255; col++)
-	{
-		clearScreen(renderer);
-
-		// Draw a line with pixels
-		drawLineWithPixels(renderer, 100, 500, col);
-
-		// Render
-		SDL_RenderPresent(renderer);
-
-		// Wait a few milliseconds
-		SDL_Delay(5);
-	}
-}
 
 void renderUsingTexture(SDL_Renderer *renderer, SDL_Texture *texture)
 {
