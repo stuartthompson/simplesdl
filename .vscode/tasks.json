@@ -1,0 +1,25 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-g",
+                "-D_THREAD_SAFE",
+                "-I/usr/local/include/SDL2",
+                "-L/usr/local/lib",
+                "-lsdl2",
+                "-std=c++11",
+                "-o",
+                "sdl",
+                "main.cpp"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
