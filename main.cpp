@@ -6,12 +6,12 @@ and may not be redistributed without written permission.*/
 #include <stdio.h>
 #include <cstdlib>
 #include <chrono>
+#include "Angle.h"
+#include "Vector2D.h"
 
 // Screen dimension constants
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
-
-const double PI = 3.14159265358979323846;
 
 const SDL_Color COLOR_RED = {255, 0, 0, 255};
 const SDL_Color COLOR_BLUE = {0, 255, 0, 255};
@@ -22,25 +22,15 @@ const SDL_Color COLOR_CYAN = {0, 255, 255, 255};
 const SDL_Color COLOR_GRAY = {128, 128, 128, 255};
 const SDL_Color COLOR_WHITE = {255, 255, 255, 255};
 
-float degreesToRadians(float degrees)
-{
-	return degrees * (PI / 180);
-}
-
-float radiansToDegrees(float radians)
-{
-	return radians * (180 / PI);
-}
-
 // calculates the end-point of a vector expressed as an origin, angle, and magnitude
-SDL_Point calcEndpoint(SDL_Point origin, float angle, float magnitude)
+Vector2D calcEndpoint(Vector2D origin, float angle, float magnitude)
 {
 	// Given the angle and hypotenuse, calculate the height and width of the triangle
 	// sin(angle) = width / hypotenuse (soh)      therefore: width = hypotenuse * sin(angle)
 	// cos(angle) = width / hypotenuse (cah)      therefore: height = hypotenuse * cos(angle)
 
 	// Degrees to radians is    rad = deg * (PI/180)
-	float angleInRadians = angle * (PI / 180);
+	float angleInRadians = degreesToRadians(angle);
 
 	float width = magnitude * sin(angleInRadians);
 	float height = magnitude * cos(angleInRadians);
@@ -48,7 +38,7 @@ SDL_Point calcEndpoint(SDL_Point origin, float angle, float magnitude)
 	return {origin.x + (int)width, origin.y + (int)height};
 }
 
-float calcLineLength(SDL_Point from, SDL_Point to)
+float calcLineLength(Vector2D from, Vector2D to)
 {
 	// c = sqrt(a^2 + b^2)   (pythagorean theorem)
 	float dx = std::abs(from.x - to.x);
@@ -63,7 +53,7 @@ void clearScreen(SDL_Renderer *renderer)
 	SDL_RenderClear(renderer);
 }
 
-void drawLine(SDL_Renderer *renderer, SDL_Point from, SDL_Point to, SDL_Color color)
+void drawLine(SDL_Renderer *renderer, Vector2D from, Vector2D to, SDL_Color color)
 {
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 
@@ -147,7 +137,7 @@ void drawLine(SDL_Renderer *renderer, SDL_Point from, SDL_Point to, SDL_Color co
 }
 
 // Draws a line from a given point using an angle and a line length
-void drawLineAtAngle(SDL_Renderer *renderer, SDL_Point from, float angle, float length, SDL_Color color)
+void drawLineAtAngle(SDL_Renderer *renderer, Vector2D from, float angle, float length, SDL_Color color)
 {
 	// Given the angle and hypotenuse, calculate the height and width of the triangle
 	// sin (angle) = width / hypotenuse (soh)
@@ -160,24 +150,24 @@ void drawLineAtAngle(SDL_Renderer *renderer, SDL_Point from, float angle, float 
 	float height = length * cos(radians);
 
 	// The "to" point is just the from point with height and width added
-	//SDL_Point to = {from.x + (int)width, from.y + (int)height};
+	//Vector2D to = {from.x + (int)width, from.y + (int)height};
 
-	SDL_Point to = calcEndpoint(from, angle, length);
+	Vector2D to = calcEndpoint(from, angle, length);
 	drawLine(renderer, from, to, color);
 }
 
-void drawCircle(SDL_Renderer *renderer, SDL_Point center, float radius, SDL_Color color)
+void drawCircle(SDL_Renderer *renderer, Vector2D center, float radius, SDL_Color color)
 {
 	// Loop through 360 degrees
 	for (int deg = 0; deg < 360; deg++)
 	{
-		SDL_Point point = calcEndpoint(center, deg, radius);
+		Vector2D point = calcEndpoint(center, deg, radius);
 		SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
 		SDL_RenderDrawPoint(renderer, point.x, point.y);
 	}
 }
 
-void drawPlane(SDL_Renderer *renderer, SDL_Point from, SDL_Point to, SDL_Color color, bool showNormal)
+void drawPlane(SDL_Renderer *renderer, Vector2D from, Vector2D to, SDL_Color color, bool showNormal)
 {
 	//drawLine(renderer, from, to, color);
 	if (showNormal)
@@ -265,7 +255,7 @@ void testDrawLine(SDL_Renderer *renderer)
 }
 
 void drawClock(
-	SDL_Renderer *renderer, SDL_Point origin, int radius, int hourMarkerLength, int hourHandLength,
+	SDL_Renderer *renderer, Vector2D origin, int radius, int hourMarkerLength, int hourHandLength,
 	int minuteHandLength, int hours, int minutes, SDL_Color borderColor, SDL_Color markerColor, SDL_Color hourHandColor, SDL_Color minuteHandColor)
 {
 	drawCircle(renderer, origin, radius, borderColor);
@@ -273,7 +263,7 @@ void drawClock(
 	for (float hour = 0; hour < 12; hour++)
 	{
 		float angle = 180 - ((360 / 12) * hour);											// Add 360/12 degrees each increment (1 marker per hour)
-		SDL_Point hourMarkerStart = calcEndpoint(origin, angle, radius - hourMarkerLength); // Calculate where hour marker line begins for this hour
+		Vector2D hourMarkerStart = calcEndpoint(origin, angle, radius - hourMarkerLength); // Calculate where hour marker line begins for this hour
 		drawLineAtAngle(renderer, hourMarkerStart, angle, hourMarkerLength, markerColor);
 	}
 	// Draw hands
