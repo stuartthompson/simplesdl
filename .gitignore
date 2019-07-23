@@ -1,1 +1,5 @@
-sdl
+# Build output
+threedee
+
+# VSCode Configuration Files
+.vscode
