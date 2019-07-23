@@ -1,12 +1,9 @@
-/*This source code copyrighted by Lazy Foo' Productions (2004-2019)
-and may not be redistributed without written permission.*/
-
-//Using SDL and standard IO
 #include <SDL.h>
 #include <stdio.h>
 #include <cstdlib>
 #include <chrono>
 #include "Angle.h"
+#include "Renderer.h"
 #include "Vector2D.h"
 
 // Screen dimension constants
@@ -21,6 +18,7 @@ const SDL_Color COLOR_YELLOW = {255, 255, 0, 255};
 const SDL_Color COLOR_CYAN = {0, 255, 255, 255};
 const SDL_Color COLOR_GRAY = {128, 128, 128, 255};
 const SDL_Color COLOR_WHITE = {255, 255, 255, 255};
+const SDL_Color COLOR_BLACK = {0, 0, 0, 255};
 
 // calculates the end-point of a vector expressed as an origin, angle, and magnitude
 Vector2D calcEndpoint(Vector2D origin, float angle, float magnitude)
@@ -280,26 +278,35 @@ void testDrawPlane(SDL_Renderer *renderer)
 {
 }
 
-void renderFrame(SDL_Renderer *renderer, int currentTime)
+void renderFrame(const Renderer& renderer, int currentTime)
 {
 	// Clear screen
-	clearScreen(renderer);
+	renderer.clearScreen(COLOR_BLACK);
 
-	// Test drawLine
-	testDrawLine(renderer);
+	// // Test drawLine
+	// testDrawLine(renderer);
 
-	// Draw a circle
-	drawCircle(renderer, {300, 100}, 50, {255, 255, 128, 255});
+	// // Draw a circle
+	// drawCircle(renderer, {300, 100}, 50, {255, 255, 128, 255});
 
-	// Draw clock
-	int hours = currentTime / 60;
-	int minutes = currentTime - (hours * 60);
-	drawClock(renderer, {400, 400}, 75, 8, 40, 55, hours, minutes, COLOR_YELLOW, COLOR_GRAY, COLOR_CYAN, COLOR_RED);
+	// // Draw clock
+	// int hours = currentTime / 60;
+	// int minutes = currentTime - (hours * 60);
+	// drawClock(renderer, {400, 400}, 75, 8, 40, 55, hours, minutes, COLOR_YELLOW, COLOR_GRAY, COLOR_CYAN, COLOR_RED);
 
-	//testDrawPlane(renderer);
+	// Draw a plane
+	Vector2D from = Vector2D();
+	Vector2D to = Vector2D();
+	from.x = 100;
+	from.y = 100;
+	to.x = 200;
+	to.y = 200;
+	
+	Plane2D plane = Plane2D(from, to);
+	renderer.drawPlane2D(plane, COLOR_BLUE);
 
 	// Render
-	SDL_RenderPresent(renderer);
+	renderer.render();
 }
 
 uint64_t timeSinceEpochMillisec() {
@@ -311,10 +318,12 @@ int main(int argc, char *args[])
 {
 	// Window and renderer
 	SDL_Window *window = NULL;
-	SDL_Renderer *renderer = NULL;
+	SDL_Renderer *sdlRenderer = NULL;
 
 	SDL_Texture *texture = NULL;
 	SDL_Event event;
+
+	Renderer* renderer;
 
 	bool quitting = false;
 
@@ -331,16 +340,19 @@ int main(int argc, char *args[])
 	else
 	{
 		// Create window and get renderer
-		SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, &window, &renderer);
+		SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, &window, &sdlRenderer);
 
 		// Create a texture to draw to slope
 		texture =
 			SDL_CreateTexture(
-				renderer,
+				sdlRenderer,
 				SDL_PIXELFORMAT_BGRA8888,
 				SDL_TEXTUREACCESS_STREAMING,
 				SCREEN_WIDTH,
 				SCREEN_HEIGHT);
+
+		// Create renderer
+		renderer = new Renderer(sdlRenderer);
 
 		if (window == NULL)
 		{
@@ -359,7 +371,7 @@ int main(int argc, char *args[])
 				}
 
 				// Render current frame
-				renderFrame(renderer, currentTime);
+				renderFrame(*renderer, currentTime);
 
 				// Check for input
 				while (SDL_PollEvent(&event))
@@ -399,6 +411,9 @@ int main(int argc, char *args[])
 					}
 				}
 			}
+
+			// Delete renderer
+			delete renderer;
 
 			// Destroy window
 			SDL_DestroyWindow(window);
