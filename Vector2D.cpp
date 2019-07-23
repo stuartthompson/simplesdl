@@ -11,22 +11,22 @@ Vector2D::Vector2D(const Vector2D &vector)
     this->y = vector.y;
 }
 
-// @Constructor
-Vector2D::Vector2D(const Point2D& point) {
-    this->x = point.x;
-    this->y = point.y;
-}
-
-// @Constructor
-Vector2D::Vector2D(const float heading, const float magnitude)
+Vector2D::Vector2D(const float x, const float y)
 {
-    // Since we know hypotenuse (magnitude) and angle, we can use soh and cah from sohcahtoa
-    //  (x): cos(a) = a/h  ==>  a = cos(a)*h
-    //  (y): sin(a) = o/h  ==>  o = sin(a)*h
-
-    this->x = cos(heading) * magnitude; // x (width)
-    this->y = sin(heading) * magnitude; // y (height)
+    this->x = x;
+    this->y = y; 
 }
+
+// @Constructor
+// Vector2D::Vector2D(const float heading, const float magnitude)
+// {
+//     // Since we know hypotenuse (magnitude) and angle, we can use soh and cah from sohcahtoa
+//     //  (x): cos(a) = a/h  ==>  a = cos(a)*h
+//     //  (y): sin(a) = o/h  ==>  o = sin(a)*h
+
+//     this->x = cos(heading) * magnitude; // x (width)
+//     this->y = sin(heading) * magnitude; // y (height)
+// }
 
 // Assignment operators
 

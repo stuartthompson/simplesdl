@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Point2D.h"
-
 /**
  * Represents a vector in 2D space.
  * 
@@ -24,11 +22,12 @@ public:
     Vector2D(const Vector2D& vector);
 
     /**
-     * Initializes a vector from a point.
+     * Initializes a vector from coordinates.
      * 
-     * @param point The point describing the end of the new vector.
+     * @param x The x coordinate of the vector.
+     * @param y The y coordinate of the vector.
      */
-    Vector2D(const Point2D& point);
+    Vector2D(float x, float y);
 
     /**
      * Initializes a vector via its heading and magnitude.
@@ -36,7 +35,7 @@ public:
      * @param heading The direction of the vector.
      * @param magnitude The length of the vector.
      */
-	Vector2D(const float heading, const float magnitude);
+	// Vector2D(const float heading, const float magnitude);
 
     /**
      * Sets the value of this vector.
