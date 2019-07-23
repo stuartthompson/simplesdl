@@ -2,7 +2,24 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build",
+            "label": "Build (Linux)",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "main.cpp",
+                "-D_REENTRANT",
+                "-I/usr/include/SDL2",
+                "-lSDL2",
+                "-o",
+                "threedee"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build (OSX)",
             "type": "shell",
             "command": "g++",
             "args": [
@@ -15,11 +32,15 @@
                 "-o",
                 "sdl",
                 "main.cpp"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            }
+            ]
+        },
+        {
+            "label": "Clean",
+            "type": "shell",
+            "command": "rm",
+            "args": [
+                "threedee"
+            ]
         }
     ]
 }
