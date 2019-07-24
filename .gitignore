@@ -3,3 +3,6 @@ threedee
 
 # VSCode Configuration Files
 .vscode
+
+# Symbols
+*.dSYM
