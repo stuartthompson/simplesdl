@@ -11,8 +11,8 @@ const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 
 const SDL_Color COLOR_RED = {255, 0, 0, 255};
-const SDL_Color COLOR_BLUE = {0, 255, 0, 255};
-const SDL_Color COLOR_GREEN = {0, 0, 255, 255};
+const SDL_Color COLOR_GREEN = {0, 255, 0, 255};
+const SDL_Color COLOR_BLUE = {0, 0, 255, 255};
 const SDL_Color COLOR_PURPLE = {255, 0, 255, 255};
 const SDL_Color COLOR_YELLOW = {255, 255, 0, 255};
 const SDL_Color COLOR_CYAN = {0, 255, 255, 255};
@@ -43,38 +43,6 @@ float calcLineLength(Vector2D from, Vector2D to)
 	float dy = std::abs(from.y - to.y);
 	return sqrt(dx * dx + dy * dy);
 }
-
-// Draws a line from a given point using an angle and a line length
-void drawLineAtAngle(SDL_Renderer *renderer, Vector2D from, float angle, float length, SDL_Color color)
-{
-	// Given the angle and hypotenuse, calculate the height and width of the triangle
-	// sin (angle) = width / hypotenuse (soh)
-	// width = hypotenuse * sin(angle)
-
-	// Convert angle to radians
-	float radians = degreesToRadians(angle);
-
-	float width = length * sin(radians);
-	float height = length * cos(radians);
-
-	// The "to" point is just the from point with height and width added
-	//Vector2D to = {from.x + (int)width, from.y + (int)height};
-
-	Vector2D to = calcEndpoint(from, angle, length);
-	//drawLine(renderer, from, to, color);
-}
-
-void drawPlane(SDL_Renderer *renderer, Vector2D from, Vector2D to, SDL_Color color, bool showNormal)
-{
-	//drawLine(renderer, from, to, color);
-	if (showNormal)
-	{
-		// Find line mid-point
-		// Find line at 90 degree angle
-		// Draw line
-	}
-}
-
 
 void renderUsingTexture(SDL_Renderer *renderer, SDL_Texture *texture)
 {
@@ -112,29 +80,26 @@ void renderUsingTexture(SDL_Renderer *renderer, SDL_Texture *texture)
 }
 
 void drawClock(
-	SDL_Renderer *renderer, Vector2D origin, int radius, int hourMarkerLength, int hourHandLength,
+	const Renderer& renderer, Vector2D origin, int radius, int hourMarkerLength, int hourHandLength,
 	int minuteHandLength, int hours, int minutes, SDL_Color borderColor, SDL_Color markerColor, SDL_Color hourHandColor, SDL_Color minuteHandColor)
 {
-	//drawCircle(renderer, origin, radius, borderColor);
+	renderer.drawCircle(origin, radius, borderColor);
 	// Draw hour markers
 	for (float hour = 0; hour < 12; hour++)
 	{
-		float angle = 180 - ((360 / 12) * hour);										   // Add 360/12 degrees each increment (1 marker per hour)
-		Vector2D hourMarkerStart = calcEndpoint(origin, angle, radius - hourMarkerLength); // Calculate where hour marker line begins for this hour
-		drawLineAtAngle(renderer, hourMarkerStart, angle, hourMarkerLength, markerColor);
+		float angle = 180 - ((360 / 12) * hour); // Add 360/12 degrees each increment (1 marker per hour)
+		Vector2D hourMarkerStart = Vector2D::fromPolar(degreesToRadians(angle), radius - hourMarkerLength) + origin;
+		Vector2D hourMarkerEnd = Vector2D::fromPolar(degreesToRadians(angle), hourMarkerLength) + hourMarkerStart;
+		renderer.drawPlane2D(Plane2D(hourMarkerStart, hourMarkerEnd), markerColor);
 	}
 	// Draw hands
-	float hourHandAngle = 180 - (hours * (360 / 12));
+	float hourHandAngle = (hours * (360 / 12)) - 90;
 	// Adjust hour handle angle for partial hour
 	float percentThroughHour = (float)minutes / (float)60;
-	hourHandAngle = hourHandAngle - ((360 / 12) * percentThroughHour);
-	drawLineAtAngle(renderer, origin, hourHandAngle, hourHandLength, hourHandColor);
-	float minuteHandAngle = 180 - (minutes * (360 / 60));
-	drawLineAtAngle(renderer, origin, minuteHandAngle, minuteHandLength, minuteHandColor);
-}
-
-void testDrawPlane(SDL_Renderer *renderer)
-{
+	hourHandAngle = hourHandAngle + ((360 / 12) * percentThroughHour);
+	renderer.drawPlane2D(Plane2D(origin, Vector2D::fromPolar(degreesToRadians(hourHandAngle), hourHandLength) + origin), hourHandColor);
+	float minuteHandAngle = (minutes * (360 / 60)) - 90;
+	renderer.drawPlane2D(Plane2D(origin, Vector2D::fromPolar(degreesToRadians(minuteHandAngle), minuteHandLength) + origin), minuteHandColor);
 }
 
 void renderFrame(const Renderer& renderer, int currentTime)
@@ -142,51 +107,28 @@ void renderFrame(const Renderer& renderer, int currentTime)
 	// Clear screen
 	renderer.clearScreen(COLOR_BLACK);
 
-	// // Draw clock
-	// int hours = currentTime / 60;
-	// int minutes = currentTime - (hours * 60);
-	// drawClock(renderer, {400, 400}, 75, 8, 40, 55, hours, minutes, COLOR_YELLOW, COLOR_GRAY, COLOR_CYAN, COLOR_RED);
+	// Draw clock
+	int hours = currentTime / 60;
+	int minutes = currentTime - (hours * 60);
+	drawClock(renderer, {400, 400}, 75, 8, 40, 55, hours, minutes, COLOR_YELLOW, COLOR_GRAY, COLOR_CYAN, COLOR_RED);
 
 	// Draw a circle
 	renderer.drawCircle({300, 100}, 50, {255, 255, 128, 255}, true);
 
 	// Draw a line
-	renderer.drawPlane2D(Plane2D({500, 100}, {550, 120}), {255, 0, 0, 255}); // + x-axis
+	renderer.drawPlane2D(Plane2D({400, 100}, {450, 120}), COLOR_RED); // + x-axis
 
 	// Draw a line at an angle
-	Vector2D start = Vector2D(100, 500);
-	Vector2D end = Vector2D::fromPolar(35, 50) + start;   
+	Vector2D start = Vector2D(400, 200);
+	Vector2D end = Vector2D::fromPolar(0, 50) + start;   
 	renderer.drawPlane2D(Plane2D(start, end), COLOR_GREEN);
 
 	// Draw lines in various directions
-	renderer.drawPlane2D(Plane2D({100, 100}, {200, 100}), {255, 0, 0, 255}); // + x-axis
-	renderer.drawPlane2D(Plane2D({100, 100}, {100, 0}), {0, 255, 0, 255});   // + y-axis
-	renderer.drawPlane2D(Plane2D({100, 100}, {0, 100}), {255, 0, 0, 255});   // - x-axis
-	renderer.drawPlane2D(Plane2D({100, 100}, {100, 200}), {0, 255, 0, 255}); // - y-axis
-
-	renderer.drawPlane2D(Plane2D({100, 100}, {200, 0}), {0, 0, 255, 255});   // - up and right (at 1:30 on a clock face)
-	renderer.drawPlane2D(Plane2D({100, 100}, {200, 200}), {0, 0, 255, 255}); // - down and right (at 4:30 on a clock face)
-	renderer.drawPlane2D(Plane2D({100, 100}, {0, 200}), {0, 0, 255, 255});   // - down and left (at 7:30 on a clock face)
-	renderer.drawPlane2D(Plane2D({100, 100}, {0, 0}), {0, 0, 255, 255});	 // - up and left (at 10:30 on a clock face)
-
-	renderer.drawPlane2D(Plane2D({100, 100}, {150, 0}), {255, 0, 255, 255});   // - up and right (at 1:00 on a clock face)
-	renderer.drawPlane2D(Plane2D({100, 100}, {200, 50}), {255, 0, 255, 255});  // - up and right (at 3:00 on a clock face)
-	renderer.drawPlane2D(Plane2D({100, 100}, {200, 150}), {255, 0, 255, 255}); // - down and right (at 4:00 on a clock face)
-	renderer.drawPlane2D(Plane2D({100, 100}, {150, 200}), {255, 0, 255, 255}); // - down and right (at 5:00 on a clock face)
-	renderer.drawPlane2D(Plane2D({100, 100}, {50, 200}), {255, 0, 255, 255});  // - down and left (at 7:00 on a clock face)
-	renderer.drawPlane2D(Plane2D({100, 100}, {0, 150}), {255, 0, 255, 255});   // - down and left (at 8:00 on a clock face)
-	renderer.drawPlane2D(Plane2D({100, 100}, {0, 50}), {255, 0, 255, 255});	// - up and left (at 10:00 on a clock face)
-	renderer.drawPlane2D(Plane2D({100, 100}, {50, 0}), {255, 0, 255, 255});	// - up and left (at 11:00 on a clock face)
-
-	renderer.drawPlane2D(Plane2D({100, 100}, {125, 0}), {255, 255, 196, 255});   // something like 12:30
-	renderer.drawPlane2D(Plane2D({100, 100}, {200, 75}), {255, 255, 196, 255});  // something like 2:30
-	renderer.drawPlane2D(Plane2D({100, 100}, {200, 125}), {255, 255, 196, 255}); // something like 3:30
-	renderer.drawPlane2D(Plane2D({100, 100}, {125, 200}), {255, 255, 196, 255}); // something like 5:30
-	renderer.drawPlane2D(Plane2D({100, 100}, {75, 200}), {255, 255, 196, 255});  // something like 6:30
-	renderer.drawPlane2D(Plane2D({100, 100}, {0, 125}), {255, 255, 196, 255});   // something like 8:30
-	renderer.drawPlane2D(Plane2D({100, 100}, {0, 75}), {255, 255, 196, 255});	// something like 9:30
-	renderer.drawPlane2D(Plane2D({100, 100}, {75, 0}), {255, 255, 196, 255});	// something like 11:30
-
+	Vector2D starburstOrigin = Vector2D({100, 100});
+	for (int i = 0; i <= 360; i += 10) {
+		renderer.drawPlane2D(Plane2D(starburstOrigin, degreesToRadians((float)i), 100), COLOR_YELLOW);
+	}
+	
 	// Render
 	renderer.render();
 }
