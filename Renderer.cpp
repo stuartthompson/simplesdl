@@ -140,7 +140,7 @@ void Renderer::drawCircle(const Vector2D& center, const float radius, const SDL_
 	for (int deg = 0; deg < 360; deg++)
 	{
 		// Vector describing the radius to draw
-		Vector2D r = Vector2D::fromPolar(degreesToRadians((float)deg), radius); // Next radius to draw
+		Vector2D r = Vector2D::fromPolar(degreesToRadians(deg), radius); // Next radius to draw
 		Vector2D endPoint = center + r; // Endpoint is center point + vector described by the current radius being drawn
 		if (fill)
 		{
