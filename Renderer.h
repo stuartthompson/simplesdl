@@ -24,6 +24,16 @@ public:
     void drawPlane2D(const Plane2D& plane, SDL_Color color) const;
     
     /**
+     * Draws a circle to the render buffer.
+     * 
+     * @param circle A 2D vector describing the center point of the circle.
+     * @param radius The radius of the circle.
+     * @param color The color of the circle.
+     * @param fill A flag indicating whether to fill the circle or draw an outline.
+     */
+    void drawCircle(const Vector2D& circle, const float radius, const SDL_Color color, const bool fill = false) const;
+
+    /**
      * Renders contents of render buffer to the screen.
      */
     void render() const;

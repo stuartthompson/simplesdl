@@ -11,22 +11,24 @@ Vector2D::Vector2D(const Vector2D &vector)
     this->y = vector.y;
 }
 
+// @Constructor
 Vector2D::Vector2D(const float x, const float y)
 {
     this->x = x;
     this->y = y; 
 }
 
-// @Constructor
-// Vector2D::Vector2D(const float heading, const float magnitude)
-// {
-//     // Since we know hypotenuse (magnitude) and angle, we can use soh and cah from sohcahtoa
-//     //  (x): cos(a) = a/h  ==>  a = cos(a)*h
-//     //  (y): sin(a) = o/h  ==>  o = sin(a)*h
+// @NamedConstructor
+Vector2D Vector2D::fromPolar(const float direction, const float magnitude)
+{
+    // Since we know hypotenuse (magnitude) and angle (direction), we can use soh and cah from sohcahtoa
+    //  (x): cos(a) = a/h  ==>  a = cos(a)*h
+    //  (y): sin(a) = o/h  ==>  o = sin(a)*h
 
-//     this->x = cos(heading) * magnitude; // x (width)
-//     this->y = sin(heading) * magnitude; // y (height)
-// }
+    float x = cos(direction) * magnitude; // x (width)
+    float y = sin(direction) * magnitude; // y (height)
+    return Vector2D(x, y);
+}
 
 // Assignment operators
 
@@ -80,7 +82,7 @@ Vector2D Vector2D::operator/(const Vector2D& vector) const {
 
 // Query functions
 
-float Vector2D::heading() const
+float Vector2D::direction() const
 {
     // sohcahtoa - so tan(a) = o/a  ==>  atan(y/x);
     return atan(this->y / this->x);
