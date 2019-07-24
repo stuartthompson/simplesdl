@@ -1,30 +1,27 @@
 #include <math.h>
 #include "Angle.h"
 
-/**
- * Converts degrees to radians.
- */
+const float M_PI_OVER_180 = M_PI / 180;
+const float M_180_OVER_PI = 180 / M_PI;
+
+// Degrees to Radians
+const float degreesToRadians(const int degrees) {
+    return degrees * M_PI_OVER_180;
+}
 const float degreesToRadians(const float degrees) {
-    return degrees * (M_PI / 180);
+    return degrees * M_PI_OVER_180;
 }
-
-/**
- * Converts degrees to radians.
- */
 const double degreesToRadians(const double degrees) {
-    return degrees * (M_PI / 180);
+    return degrees * M_PI_OVER_180;
 }
 
-/**
- * Converts radians to degrees.
- */
+// Radians to Degrees
+const float radiansToDegrees(const int radians) {
+    return radians * M_180_OVER_PI;
+}
 const float radiansToDegrees(const float radians) {
-    return radians * (180 / M_PI);
+    return radians * M_180_OVER_PI;
 }
-
-/**
- * Converts radians to degrees.
- */
 const double radiansToDegrees(const double radians) {
-    return radians * (180 / M_PI);
+    return radians * M_180_OVER_PI;
 }
