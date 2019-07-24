@@ -7,14 +7,19 @@ Renderer::Renderer(SDL_Renderer *renderer)
 	this->renderer_ = renderer;
 }
 
-void Renderer::clearScreen(SDL_Color color) const
+void Renderer::clearScreen(const Color& color) const
 {
 	// Clear screen
-	SDL_SetRenderDrawColor(this->renderer_, color.r, color.g, color.b, color.a);
+	this->setDrawColor(color);
 	SDL_RenderClear(this->renderer_);
 }
 
-void Renderer::drawPlane2D(const Plane2D &plane, SDL_Color color) const
+void Renderer::setDrawColor(const Color& color) const
+{
+	SDL_SetRenderDrawColor(this->renderer_, color.r, color.g, color.b, color.a);
+}
+
+void Renderer::drawPlane2D(const Plane2D &plane, Color color) const
 {
 	SDL_SetRenderDrawColor(this->renderer_, color.r, color.g, color.b, color.a);
 
@@ -132,19 +137,19 @@ void Renderer::drawPlane2D(const Plane2D &plane, SDL_Color color) const
 	}
 }
 
-void Renderer::drawCircle(const Vector2D& center, const float radius, const SDL_Color color, const bool fill) const
+void Renderer::drawCircle(const Circle& circle) const
 {
-	SDL_SetRenderDrawColor(this->renderer_, color.r, color.g, color.b, color.a);
+	this->setDrawColor(circle.color);
 
 	// Loop through 360 degrees
 	for (int deg = 0; deg < 360; deg++)
 	{
 		// Vector describing the radius to draw
-		Vector2D r = Vector2D::fromPolar(degreesToRadians(deg), radius); // Next radius to draw
-		Vector2D endPoint = center + r; // Endpoint is center point + vector described by the current radius being drawn
-		if (fill)
+		Vector2D r = Vector2D::fromPolar(degreesToRadians(deg), circle.radius); // Next radius to draw
+		Vector2D endPoint = circle.center + r; // Endpoint is center point + vector described by the current radius being drawn
+		if (circle.fill)
 		{
-			SDL_RenderDrawLine(this->renderer_, center.x, center.y, endPoint.x, endPoint.y);
+			SDL_RenderDrawLine(this->renderer_, circle.center.x, circle.center.y, endPoint.x, endPoint.y);
 		}
 		else 
 		{
@@ -156,4 +161,9 @@ void Renderer::drawCircle(const Vector2D& center, const float radius, const SDL_
 void Renderer::render() const
 {
 	SDL_RenderPresent(this->renderer_);
+}
+
+SDL_Color Renderer::toSDLColor(const Color& color) const 
+{
+	return SDL_Color({color.r, color.g, color.b, color.a});
 }

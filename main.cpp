@@ -3,22 +3,14 @@
 #include <cstdlib>
 #include <chrono>
 #include "Angle.h"
+#include "Circle.h"
+#include "Color.h"
 #include "Renderer.h"
 #include "Vector2D.h"
 
 // Screen dimension constants
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
-
-const SDL_Color COLOR_RED = {255, 0, 0, 255};
-const SDL_Color COLOR_GREEN = {0, 255, 0, 255};
-const SDL_Color COLOR_BLUE = {0, 0, 255, 255};
-const SDL_Color COLOR_PURPLE = {255, 0, 255, 255};
-const SDL_Color COLOR_YELLOW = {255, 255, 0, 255};
-const SDL_Color COLOR_CYAN = {0, 255, 255, 255};
-const SDL_Color COLOR_GRAY = {128, 128, 128, 255};
-const SDL_Color COLOR_WHITE = {255, 255, 255, 255};
-const SDL_Color COLOR_BLACK = {0, 0, 0, 255};
 
 // calculates the end-point of a vector expressed as an origin, angle, and magnitude
 Vector2D calcEndpoint(Vector2D origin, float angle, float magnitude)
@@ -80,10 +72,10 @@ void renderUsingTexture(SDL_Renderer *renderer, SDL_Texture *texture)
 }
 
 void drawClock(
-	const Renderer& renderer, Vector2D origin, int radius, int hourMarkerLength, int hourHandLength,
-	int minuteHandLength, int hours, int minutes, SDL_Color borderColor, SDL_Color markerColor, SDL_Color hourHandColor, SDL_Color minuteHandColor)
+	const Renderer& renderer, Vector2D origin, float radius, int hourMarkerLength, int hourHandLength,
+	int minuteHandLength, int hours, int minutes, Color borderColor, Color markerColor, Color hourHandColor, Color minuteHandColor)
 {
-	renderer.drawCircle(origin, radius, borderColor);
+	renderer.drawCircle(Circle({origin, radius, borderColor, false}));
 	// Draw hour markers
 	for (float hour = 0; hour < 12; hour++)
 	{
@@ -113,7 +105,7 @@ void renderFrame(const Renderer& renderer, int currentTime)
 	drawClock(renderer, {400, 400}, 75, 8, 40, 55, hours, minutes, COLOR_YELLOW, COLOR_GRAY, COLOR_CYAN, COLOR_RED);
 
 	// Draw a circle
-	renderer.drawCircle({300, 100}, 50, {255, 255, 128, 255}, true);
+	renderer.drawCircle(Circle(Vector2D({300, 100}), 50, Color({255, 255, 128, 255}), true));
 
 	// Draw a line
 	renderer.drawPlane2D(Plane2D({400, 100}, {450, 120}), COLOR_RED); // + x-axis
