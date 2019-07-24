@@ -22,17 +22,26 @@ public:
     Plane2D(const Plane2D& plane);
 
     /**
-     * Initializes a 2D plane from a pair of 2D coordinates.
+     * Initializes a 2D plane from two pairs of coordinates.
      */
-    Plane2D(float x1, float y1, float x2, float y2);
+    Plane2D(const float x1, const float y1, const float x2, const float y2);
 
     /**
      * Initializes a 2D plane from a pair of 2D vectors.
      * 
-     * @param start The vector describing the start of the new plane.
-     * @param end The vector describing the end of the new plane.
+     * @param start A vector whose endpoint identifies the start of the plane.
+     * @param end A vector whose endpoint identifies the end of the plane.
      */
     Plane2D(const Vector2D& start, const Vector2D& end);
+
+    /**
+     * Initializes a 2D plane from a start position, angle, and length.
+     * 
+     * @param start A vector whose endpoint identifies the start of the plane.
+     * @param angle The angle of the plane.
+     * @param length The length of the plane.
+     */
+    Plane2D(const Vector2D& start, const float angle, const float length);
 
     /**
      * Returns the angle of the vector this plane describes.

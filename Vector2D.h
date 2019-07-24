@@ -4,7 +4,6 @@
  * Represents a vector in 2D space.
  * 
  * A vector is stored as a point, which has an implicit direction and magnitude from the 2D origin.
- * In this way, a vector completely describes a point and can be used as a point when no heading or magnitude are needed.
  */
 class Vector2D
 {
@@ -24,18 +23,17 @@ public:
     /**
      * Initializes a vector from coordinates.
      * 
-     * @param x The x coordinate of the vector.
-     * @param y The y coordinate of the vector.
+     * @param point The x and y coordinates of the vector.
      */
-    Vector2D(float x, float y);
+    Vector2D(const float x, const float y);
 
-    /**
-     * Initializes a vector via its heading and magnitude.
-     * 
-     * @param heading The direction of the vector.
-     * @param magnitude The length of the vector.
+    /** 
+     * Initializes a vector using direction and magnitude (polar). 
+     *
+     * @param direction The angle of the vector.
+     * @param magnitude The length of the vector. 
      */
-	// Vector2D(const float heading, const float magnitude);
+    static Vector2D fromPolar(const float direction, const float magnitude);
 
     /**
      * Sets the value of this vector.
@@ -58,10 +56,10 @@ public:
     Vector2D operator/(const Vector2D& vector) const;
 
     /**
-     * Returns the heading of the vector.
+     * Returns the direction of the vector.
      * This is the angle that describes the vector from the origin.
      */
-	float heading() const;
+	float direction() const;
 
     /**
      * Returns the magnitude (length) of the vector.

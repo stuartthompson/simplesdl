@@ -44,96 +44,6 @@ float calcLineLength(Vector2D from, Vector2D to)
 	return sqrt(dx * dx + dy * dy);
 }
 
-void clearScreen(SDL_Renderer *renderer)
-{
-	// Clear screen
-	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-	SDL_RenderClear(renderer);
-}
-
-void drawLine(SDL_Renderer *renderer, Vector2D from, Vector2D to, SDL_Color color)
-{
-	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-
-	// Figure out whether x or y is covering more distance (i.e is the slope more horizontal or vertical)
-	float dx = from.x - to.x;
-	float dy = from.y - to.y;
-
-	// Determine the slope of the line (i.e. vector 3,9 has slope 1/3 (or y/x == 9/3))
-	float x, y;
-
-	// Horizontal and vertical lines are plotted differently
-	if (dx == 0) // Vertical line
-	{
-		if (from.y <= to.y) // Line is drawn top to bottom so have to increment from to (origin is top-left in SDL)
-		{
-			for (y = from.y; y <= to.y; y++)
-			{
-				SDL_RenderDrawPoint(renderer, from.x, y);
-			}
-		}
-		else
-		// Line is drawn bottom to top so have to decrement from to (origin is top-left in SDL)
-		{
-			for (y = from.y; y >= to.y; y--)
-			{
-				SDL_RenderDrawPoint(renderer, from.x, y);
-			}
-		}
-	}
-	else if (dy == 0) // Horizontal line
-	{
-		if (from.x <= to.x) // Line is drawn left to right so have to increment from to (origin is top-left in SDL)
-		{
-			for (x = from.x; x <= to.x; x++)
-			{
-				SDL_RenderDrawPoint(renderer, x, from.y);
-			}
-		}
-		else // Line is drawn right to left so have to decrement from to (origin is top-left in SDL)
-		{
-			for (x = from.x; x >= to.x; x--)
-			{
-				SDL_RenderDrawPoint(renderer, x, from.y);
-			}
-		}
-	}
-	// Sloped line
-	else
-	{
-		// Determine the slope of the line (i.e. vector 3,9 has slope 1/3 (or y/x == 9/3))
-		float slope = dy / dx;
-
-		// Draw more than one segment per x-pixel if slope is greater than 1 or less than -1 (fills in near-vertical lines)
-		float xInc = 1;
-		if (slope > 1) {
-			xInc = 1 / slope;
-		}
-		if (slope < -1) {
-			xInc = -1 / slope;
-		}
-
-		// Plot for integer values of x
-		// Find quadrant
-		if (from.x <= to.x) // Line is moving to the right
-		{
-			for (x = from.x; x <= to.x; x+=xInc)
-			{
-				y = (slope * (x - from.x)) + from.y; // Plot the point using y = mx + c
-				SDL_RenderDrawPoint(renderer, x, y);
-			}
-		}
-		else // Line is moving to the left
-		{
-			for (x = from.x; x >= to.x; x-=xInc)
-			{
-				y = (slope * (x - from.x)) + from.y; // Plot the point using y = mx + c
-				SDL_RenderDrawPoint(renderer, x, y);
-			}
-		}
-	}
-}
-
 // Draws a line from a given point using an angle and a line length
 void drawLineAtAngle(SDL_Renderer *renderer, Vector2D from, float angle, float length, SDL_Color color)
 {
@@ -151,18 +61,7 @@ void drawLineAtAngle(SDL_Renderer *renderer, Vector2D from, float angle, float l
 	//Vector2D to = {from.x + (int)width, from.y + (int)height};
 
 	Vector2D to = calcEndpoint(from, angle, length);
-	drawLine(renderer, from, to, color);
-}
-
-void drawCircle(SDL_Renderer *renderer, Vector2D center, float radius, SDL_Color color)
-{
-	// Loop through 360 degrees
-	for (int deg = 0; deg < 360; deg++)
-	{
-		Vector2D point = calcEndpoint(center, deg, radius);
-		SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
-		SDL_RenderDrawPoint(renderer, point.x, point.y);
-	}
+	//drawLine(renderer, from, to, color);
 }
 
 void drawPlane(SDL_Renderer *renderer, Vector2D from, Vector2D to, SDL_Color color, bool showNormal)
@@ -190,8 +89,6 @@ void renderUsingTexture(SDL_Renderer *renderer, SDL_Texture *texture)
 	// Draw 255 "frames"
 	for (int col = 0; col < 255; col++)
 	{
-		clearScreen(renderer);
-
 		SDL_LockTexture(texture,
 						NULL, // NULL means the *whole texture* here.
 						(void **)&pixels,
@@ -211,56 +108,18 @@ void renderUsingTexture(SDL_Renderer *renderer, SDL_Texture *texture)
 		SDL_RenderCopy(renderer, texture, NULL, NULL);
 
 		SDL_UnlockTexture(texture);
-
-		// Render
-		SDL_RenderPresent(renderer);
-
-		SDL_Delay(5);
 	}
-}
-
-// Tests the drawline function by plotting some axis and different slope lines in all quadrants
-void testDrawLine(SDL_Renderer *renderer)
-{
-	// Draw clock lines (with hand-crafted coordinates; note: line lengths are wrong)
-	drawLine(renderer, {100, 100}, {200, 100}, {255, 0, 0, 255}); // + x-axis
-	drawLine(renderer, {100, 100}, {100, 0}, {0, 255, 0, 255});   // + y-axis
-	drawLine(renderer, {100, 100}, {0, 100}, {255, 0, 0, 255});   // - x-axis
-	drawLine(renderer, {100, 100}, {100, 200}, {0, 255, 0, 255}); // - y-axis
-
-	drawLine(renderer, {100, 100}, {200, 0}, {0, 0, 255, 255});   // - up and right (at 1:30 on a clock face)
-	drawLine(renderer, {100, 100}, {200, 200}, {0, 0, 255, 255}); // - down and right (at 4:30 on a clock face)
-	drawLine(renderer, {100, 100}, {0, 200}, {0, 0, 255, 255});   // - down and left (at 7:30 on a clock face)
-	drawLine(renderer, {100, 100}, {0, 0}, {0, 0, 255, 255});	 // - up and left (at 10:30 on a clock face)
-
-	drawLine(renderer, {100, 100}, {150, 0}, {255, 0, 255, 255});   // - up and right (at 1:00 on a clock face)
-	drawLine(renderer, {100, 100}, {200, 50}, {255, 0, 255, 255});  // - up and right (at 3:00 on a clock face)
-	drawLine(renderer, {100, 100}, {200, 150}, {255, 0, 255, 255}); // - down and right (at 4:00 on a clock face)
-	drawLine(renderer, {100, 100}, {150, 200}, {255, 0, 255, 255}); // - down and right (at 5:00 on a clock face)
-	drawLine(renderer, {100, 100}, {50, 200}, {255, 0, 255, 255});  // - down and left (at 7:00 on a clock face)
-	drawLine(renderer, {100, 100}, {0, 150}, {255, 0, 255, 255});   // - down and left (at 8:00 on a clock face)
-	drawLine(renderer, {100, 100}, {0, 50}, {255, 0, 255, 255});	// - up and left (at 10:00 on a clock face)
-	drawLine(renderer, {100, 100}, {50, 0}, {255, 0, 255, 255});	// - up and left (at 11:00 on a clock face)
-
-	drawLine(renderer, {100, 100}, {125, 0}, {255, 255, 196, 255});   // something like 12:30
-	drawLine(renderer, {100, 100}, {200, 75}, {255, 255, 196, 255});  // something like 2:30
-	drawLine(renderer, {100, 100}, {200, 125}, {255, 255, 196, 255}); // something like 3:30
-	drawLine(renderer, {100, 100}, {125, 200}, {255, 255, 196, 255}); // something like 5:30
-	drawLine(renderer, {100, 100}, {75, 200}, {255, 255, 196, 255});  // something like 6:30
-	drawLine(renderer, {100, 100}, {0, 125}, {255, 255, 196, 255});   // something like 8:30
-	drawLine(renderer, {100, 100}, {0, 75}, {255, 255, 196, 255});	// something like 9:30
-	drawLine(renderer, {100, 100}, {75, 0}, {255, 255, 196, 255});	// something like 11:30
 }
 
 void drawClock(
 	SDL_Renderer *renderer, Vector2D origin, int radius, int hourMarkerLength, int hourHandLength,
 	int minuteHandLength, int hours, int minutes, SDL_Color borderColor, SDL_Color markerColor, SDL_Color hourHandColor, SDL_Color minuteHandColor)
 {
-	drawCircle(renderer, origin, radius, borderColor);
+	//drawCircle(renderer, origin, radius, borderColor);
 	// Draw hour markers
 	for (float hour = 0; hour < 12; hour++)
 	{
-		float angle = 180 - ((360 / 12) * hour);											// Add 360/12 degrees each increment (1 marker per hour)
+		float angle = 180 - ((360 / 12) * hour);										   // Add 360/12 degrees each increment (1 marker per hour)
 		Vector2D hourMarkerStart = calcEndpoint(origin, angle, radius - hourMarkerLength); // Calculate where hour marker line begins for this hour
 		drawLineAtAngle(renderer, hourMarkerStart, angle, hourMarkerLength, markerColor);
 	}
@@ -283,27 +142,50 @@ void renderFrame(const Renderer& renderer, int currentTime)
 	// Clear screen
 	renderer.clearScreen(COLOR_BLACK);
 
-	// // Test drawLine
-	// testDrawLine(renderer);
-
-	// // Draw a circle
-	// drawCircle(renderer, {300, 100}, 50, {255, 255, 128, 255});
-
 	// // Draw clock
 	// int hours = currentTime / 60;
 	// int minutes = currentTime - (hours * 60);
 	// drawClock(renderer, {400, 400}, 75, 8, 40, 55, hours, minutes, COLOR_YELLOW, COLOR_GRAY, COLOR_CYAN, COLOR_RED);
 
-	// Draw a plane
-	Vector2D from = Vector2D();
-	Vector2D to = Vector2D();
-	from.x = 100;
-	from.y = 100;
-	to.x = 200;
-	to.y = 200;
-	
-	Plane2D plane = Plane2D(from, to);
-	renderer.drawPlane2D(plane, COLOR_BLUE);
+	// Draw a circle
+	renderer.drawCircle({300, 100}, 50, {255, 255, 128, 255}, true);
+
+	// Draw a line
+	renderer.drawPlane2D(Plane2D({500, 100}, {550, 120}), {255, 0, 0, 255}); // + x-axis
+
+	// Draw a line at an angle
+	Vector2D start = Vector2D(100, 500);
+	Vector2D end = Vector2D::fromPolar(35, 50) + start;   
+	renderer.drawPlane2D(Plane2D(start, end), COLOR_GREEN);
+
+	// Draw lines in various directions
+	renderer.drawPlane2D(Plane2D({100, 100}, {200, 100}), {255, 0, 0, 255}); // + x-axis
+	renderer.drawPlane2D(Plane2D({100, 100}, {100, 0}), {0, 255, 0, 255});   // + y-axis
+	renderer.drawPlane2D(Plane2D({100, 100}, {0, 100}), {255, 0, 0, 255});   // - x-axis
+	renderer.drawPlane2D(Plane2D({100, 100}, {100, 200}), {0, 255, 0, 255}); // - y-axis
+
+	renderer.drawPlane2D(Plane2D({100, 100}, {200, 0}), {0, 0, 255, 255});   // - up and right (at 1:30 on a clock face)
+	renderer.drawPlane2D(Plane2D({100, 100}, {200, 200}), {0, 0, 255, 255}); // - down and right (at 4:30 on a clock face)
+	renderer.drawPlane2D(Plane2D({100, 100}, {0, 200}), {0, 0, 255, 255});   // - down and left (at 7:30 on a clock face)
+	renderer.drawPlane2D(Plane2D({100, 100}, {0, 0}), {0, 0, 255, 255});	 // - up and left (at 10:30 on a clock face)
+
+	renderer.drawPlane2D(Plane2D({100, 100}, {150, 0}), {255, 0, 255, 255});   // - up and right (at 1:00 on a clock face)
+	renderer.drawPlane2D(Plane2D({100, 100}, {200, 50}), {255, 0, 255, 255});  // - up and right (at 3:00 on a clock face)
+	renderer.drawPlane2D(Plane2D({100, 100}, {200, 150}), {255, 0, 255, 255}); // - down and right (at 4:00 on a clock face)
+	renderer.drawPlane2D(Plane2D({100, 100}, {150, 200}), {255, 0, 255, 255}); // - down and right (at 5:00 on a clock face)
+	renderer.drawPlane2D(Plane2D({100, 100}, {50, 200}), {255, 0, 255, 255});  // - down and left (at 7:00 on a clock face)
+	renderer.drawPlane2D(Plane2D({100, 100}, {0, 150}), {255, 0, 255, 255});   // - down and left (at 8:00 on a clock face)
+	renderer.drawPlane2D(Plane2D({100, 100}, {0, 50}), {255, 0, 255, 255});	// - up and left (at 10:00 on a clock face)
+	renderer.drawPlane2D(Plane2D({100, 100}, {50, 0}), {255, 0, 255, 255});	// - up and left (at 11:00 on a clock face)
+
+	renderer.drawPlane2D(Plane2D({100, 100}, {125, 0}), {255, 255, 196, 255});   // something like 12:30
+	renderer.drawPlane2D(Plane2D({100, 100}, {200, 75}), {255, 255, 196, 255});  // something like 2:30
+	renderer.drawPlane2D(Plane2D({100, 100}, {200, 125}), {255, 255, 196, 255}); // something like 3:30
+	renderer.drawPlane2D(Plane2D({100, 100}, {125, 200}), {255, 255, 196, 255}); // something like 5:30
+	renderer.drawPlane2D(Plane2D({100, 100}, {75, 200}), {255, 255, 196, 255});  // something like 6:30
+	renderer.drawPlane2D(Plane2D({100, 100}, {0, 125}), {255, 255, 196, 255});   // something like 8:30
+	renderer.drawPlane2D(Plane2D({100, 100}, {0, 75}), {255, 255, 196, 255});	// something like 9:30
+	renderer.drawPlane2D(Plane2D({100, 100}, {75, 0}), {255, 255, 196, 255});	// something like 11:30
 
 	// Render
 	renderer.render();
