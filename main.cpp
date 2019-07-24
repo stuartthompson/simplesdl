@@ -126,7 +126,7 @@ void renderFrame(const Renderer& renderer, int currentTime)
 	// Draw lines in various directions
 	Vector2D starburstOrigin = Vector2D({100, 100});
 	for (int i = 0; i <= 360; i += 10) {
-		renderer.drawPlane2D(Plane2D(starburstOrigin, degreesToRadians((float)i), 100), COLOR_YELLOW);
+		renderer.drawPlane2D(Plane2D(starburstOrigin, degreesToRadians(i), 100), COLOR_YELLOW);
 	}
 	
 	// Render
