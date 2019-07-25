@@ -73,6 +73,20 @@ public:
      */
     float distanceFrom(const Vector2D& vector) const;
 
+    /**
+     * Enumeration representing the possible orientations of a vector triplet.
+     */
+    enum Orientation {
+        Colinear,
+        Clockwise,
+        AntiClockwise
+    };
+
+    /**
+     * Gets the orientation of three vectors.
+     */
+    static Vector2D::Orientation orientation(const Vector2D& p, const Vector2D& q, const Vector2D& r);
+
     // x and y coordinate of the vector
     float x, y; 
 };

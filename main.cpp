@@ -1,4 +1,5 @@
 #include <SDL.h>
+#include <SDL_ttf.h>
 #include <stdio.h>
 #include <cstdlib>
 #include <chrono>
@@ -87,6 +88,9 @@ int main(int argc, char *args[])
 		// Create window and get renderer
 		SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, &window, &sdlRenderer);
 
+		// Initialize SDL TTF (for fonts/text rendering)
+		TTF_Init();
+
 		// Create a texture to draw to slope
 		// TODO: Archive this
 		texture =
@@ -166,6 +170,9 @@ int main(int argc, char *args[])
 
 			// Destroy window
 			SDL_DestroyWindow(window);
+
+			// Quit SDL ttf
+			TTF_Quit();
 
 			// Quit SDL subsystems
 			SDL_Quit();
