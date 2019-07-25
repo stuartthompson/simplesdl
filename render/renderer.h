@@ -1,9 +1,9 @@
 #pragma once
 
 #include <SDL.h>
-#include "Circle.h"
-#include "Line2D.h"
-#include "Point2D.h"
+#include "circle.h"
+#include "line2d.h"
+#include "point2d.h"
 
 class Renderer
 {

@@ -1,8 +1,8 @@
 #include <string>
-#include "../math/math.h"
-#include "Point2D.h"
-#include "Renderer.h"
-#include "Scene.h"
+#include <zen-math.h>
+#include "point2d.h"
+#include "renderer.h"
+#include "scene.h"
 
 void Scene::load(const std::string& sceneName) 
 {
