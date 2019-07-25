@@ -1,7 +1,9 @@
 #pragma once
 
 #include <SDL.h>
-#include "Plane2D.h"
+#include "Circle.h"
+#include "Line2D.h"
+#include "Point2D.h"
 
 class Renderer
 {
@@ -13,25 +15,35 @@ public:
      * 
      * @param color The color to clean the screen to.
      */
-    void clearScreen(SDL_Color color) const;
+    void clearScreen(const Color& color) const;
 
     /**
-     * Draws a 2D plane to the render buffer.
+     * Sets the draw color to the specified color.
      * 
-     * @param plane The plane to render.
-     * @param color The color to use to render the plane.
+     * @param color The color to set.
      */
-    void drawPlane2D(const Plane2D& plane, SDL_Color color) const;
+    void setDrawColor(const Color& color) const;
+
+    /**
+     * Draws a 2D point to the render buffer.
+     * 
+     * @param point The point to draw.
+     */
+    void drawPoint2D(const Point2D& point) const;
+
+    /**
+     * Draws a 2D line to the render buffer.
+     * 
+     * @param line The line to render.
+     */
+    void drawLine2D(const Line2D& line) const;
     
     /**
      * Draws a circle to the render buffer.
      * 
-     * @param circle A 2D vector describing the center point of the circle.
-     * @param radius The radius of the circle.
-     * @param color The color of the circle.
-     * @param fill A flag indicating whether to fill the circle or draw an outline.
+     * @param circle The circle to draw.
      */
-    void drawCircle(const Vector2D& circle, const float radius, const SDL_Color color, const bool fill = false) const;
+    void drawCircle(const Circle& circle) const;
 
     /**
      * Renders contents of render buffer to the screen.

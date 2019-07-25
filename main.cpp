@@ -2,23 +2,17 @@
 #include <stdio.h>
 #include <cstdlib>
 #include <chrono>
+#include <string>
 #include "Angle.h"
+#include "Circle.h"
+#include "Color.h"
 #include "Renderer.h"
+#include "Scene.h"
 #include "Vector2D.h"
 
 // Screen dimension constants
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
-
-const SDL_Color COLOR_RED = {255, 0, 0, 255};
-const SDL_Color COLOR_GREEN = {0, 255, 0, 255};
-const SDL_Color COLOR_BLUE = {0, 0, 255, 255};
-const SDL_Color COLOR_PURPLE = {255, 0, 255, 255};
-const SDL_Color COLOR_YELLOW = {255, 255, 0, 255};
-const SDL_Color COLOR_CYAN = {0, 255, 255, 255};
-const SDL_Color COLOR_GRAY = {128, 128, 128, 255};
-const SDL_Color COLOR_WHITE = {255, 255, 255, 255};
-const SDL_Color COLOR_BLACK = {0, 0, 0, 255};
 
 // calculates the end-point of a vector expressed as an origin, angle, and magnitude
 Vector2D calcEndpoint(Vector2D origin, float angle, float magnitude)
@@ -79,58 +73,12 @@ void renderUsingTexture(SDL_Renderer *renderer, SDL_Texture *texture)
 	}
 }
 
-void drawClock(
-	const Renderer& renderer, Vector2D origin, int radius, int hourMarkerLength, int hourHandLength,
-	int minuteHandLength, int hours, int minutes, SDL_Color borderColor, SDL_Color markerColor, SDL_Color hourHandColor, SDL_Color minuteHandColor)
+void drawScene(const Renderer& renderer, const std::string& sceneName)
 {
-	renderer.drawCircle(origin, radius, borderColor);
-	// Draw hour markers
-	for (float hour = 0; hour < 12; hour++)
-	{
-		float angle = 180 - ((360 / 12) * hour); // Add 360/12 degrees each increment (1 marker per hour)
-		Vector2D hourMarkerStart = Vector2D::fromPolar(degreesToRadians(angle), radius - hourMarkerLength) + origin;
-		Vector2D hourMarkerEnd = Vector2D::fromPolar(degreesToRadians(angle), hourMarkerLength) + hourMarkerStart;
-		renderer.drawPlane2D(Plane2D(hourMarkerStart, hourMarkerEnd), markerColor);
-	}
-	// Draw hands
-	float hourHandAngle = (hours * (360 / 12)) - 90;
-	// Adjust hour handle angle for partial hour
-	float percentThroughHour = (float)minutes / (float)60;
-	hourHandAngle = hourHandAngle + ((360 / 12) * percentThroughHour);
-	renderer.drawPlane2D(Plane2D(origin, Vector2D::fromPolar(degreesToRadians(hourHandAngle), hourHandLength) + origin), hourHandColor);
-	float minuteHandAngle = (minutes * (360 / 60)) - 90;
-	renderer.drawPlane2D(Plane2D(origin, Vector2D::fromPolar(degreesToRadians(minuteHandAngle), minuteHandLength) + origin), minuteHandColor);
-}
+	Scene scene = Scene();
+	scene.load(sceneName);
 
-void renderFrame(const Renderer& renderer, int currentTime)
-{
-	// Clear screen
-	renderer.clearScreen(COLOR_BLACK);
-
-	// Draw clock
-	int hours = currentTime / 60;
-	int minutes = currentTime - (hours * 60);
-	drawClock(renderer, {400, 400}, 75, 8, 40, 55, hours, minutes, COLOR_YELLOW, COLOR_GRAY, COLOR_CYAN, COLOR_RED);
-
-	// Draw a circle
-	renderer.drawCircle({300, 100}, 50, {255, 255, 128, 255}, true);
-
-	// Draw a line
-	renderer.drawPlane2D(Plane2D({400, 100}, {450, 120}), COLOR_RED); // + x-axis
-
-	// Draw a line at an angle
-	Vector2D start = Vector2D(400, 200);
-	Vector2D end = Vector2D::fromPolar(0, 50) + start;   
-	renderer.drawPlane2D(Plane2D(start, end), COLOR_GREEN);
-
-	// Draw lines in various directions
-	Vector2D starburstOrigin = Vector2D({100, 100});
-	for (int i = 0; i <= 360; i += 10) {
-		renderer.drawPlane2D(Plane2D(starburstOrigin, degreesToRadians(i), 100), COLOR_YELLOW);
-	}
-	
-	// Render
-	renderer.render();
+	scene.render(renderer);
 }
 
 uint64_t timeSinceEpochMillisec() {
@@ -194,8 +142,11 @@ int main(int argc, char *args[])
 					lastTick = now;
 				}
 
-				// Render current frame
-				renderFrame(*renderer, currentTime);
+				// Draw test scene
+				drawScene(*renderer, "SinglePoint");
+
+				// Render
+				renderer->render();
 
 				// Check for input
 				while (SDL_PollEvent(&event))
