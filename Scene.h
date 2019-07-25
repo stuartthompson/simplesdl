@@ -14,7 +14,7 @@ public:
     void render(const Renderer& renderer) const;
 
 private:
-    std::vector<Plane2D> planes_;
-    std::vector<Circle> circles_;
+    std::vector<Line2D> lines_;
     std::vector<Point2D> points_;
+    std::vector<Circle> circles_;
 };
