@@ -1,4 +1,4 @@
-#include "Plane2D.h"
+#include "plane2d.h"
 
 // @DefaultConstructor
 Plane2D::Plane2D() : start_({0, 0}), end_({0, 0}) {}

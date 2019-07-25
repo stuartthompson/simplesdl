@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Vector2D.h"
+#include "vector2d.h"
 
 /**
  * Represents a plane in 2-dimensional space.
