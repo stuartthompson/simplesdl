@@ -1,6 +1,6 @@
 #include <iostream>
-#include "../math/math.h"
-#include "Renderer.h"
+#include <zen-math.h>
+#include "renderer.h"
 
 Renderer::Renderer(SDL_Renderer *renderer)
 {

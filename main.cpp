@@ -3,11 +3,8 @@
 #include <cstdlib>
 #include <chrono>
 #include <string>
-#include "math/math.h"
-#include "render/Circle.h"
-#include "render/Color.h"
-#include "render/Renderer.h"
-#include "render/Scene.h"
+#include <zen-math.h>
+#include <zen-render.h>
 
 // Screen dimension constants
 const int SCREEN_WIDTH = 800;
