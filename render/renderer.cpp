@@ -1,3 +1,5 @@
+#include <SDL.h>
+#include <SDL_ttf.h>
 #include <iostream>
 #include <zen-math.h>
 #include "renderer.h"
@@ -7,18 +9,18 @@ Renderer::Renderer(SDL_Renderer *renderer)
 	this->renderer_ = renderer;
 }
 
-void Renderer::clearScreen(const Color& color) const
+void Renderer::clearScreen(const Color &color) const
 {
-	this->setDrawColor(color); // Set screen clear color
+	this->setDrawColor(color);		  // Set screen clear color
 	SDL_RenderClear(this->renderer_); // Clear screen
 }
 
-void Renderer::setDrawColor(const Color& color) const
+void Renderer::setDrawColor(const Color &color) const
 {
 	SDL_SetRenderDrawColor(this->renderer_, color.r, color.g, color.b, color.a);
 }
 
-void Renderer::drawPoint2D(const Point2D& point) const 
+void Renderer::drawPoint2D(const Point2D &point) const
 {
 	this->setDrawColor(point.color);
 	SDL_RenderDrawPoint(this->renderer_, point.location.x, point.location.y);
@@ -96,7 +98,7 @@ void Renderer::drawLine2D(const Line2D &line) const
 		if (slope <= 1 && slope >= -1)
 		{
 			// Line is more horizontal than vertical so plot using x increments
-			if (from.x <= to.x) 
+			if (from.x <= to.x)
 			{
 				// Line is moving to the right
 				for (x = from.x; x <= to.x; x++)
@@ -105,8 +107,8 @@ void Renderer::drawLine2D(const Line2D &line) const
 					SDL_RenderDrawPoint(this->renderer_, x, y);
 				}
 			}
-			else 
-			{	
+			else
+			{
 				// Line is moving to the left
 				for (x = from.x; x >= to.x; x--)
 				{
@@ -114,27 +116,27 @@ void Renderer::drawLine2D(const Line2D &line) const
 					SDL_RenderDrawPoint(this->renderer_, x, y);
 				}
 			}
-		} 
-		else 
+		}
+		else
 		{
 			// Line is more vertical than horizontal so plot using y increments
-			if (from.y <= to.y) 
+			if (from.y <= to.y)
 			{
 				// Line is moving down
 				for (y = from.y; y <= to.y; y++)
 				{
 					// x = (y-c) / m
-					x = ((y - from.y)/ slope)  + from.x;
+					x = ((y - from.y) / slope) + from.x;
 					SDL_RenderDrawPoint(this->renderer_, x, y);
 				}
 			}
-			else 
+			else
 			{
 				// Line is moving up
 				for (y = from.y; y >= to.y; y--)
 				{
 					// x = (y-c) / m
-					x = ((y - from.y)/ slope) + from.x;
+					x = ((y - from.y) / slope) + from.x;
 					SDL_RenderDrawPoint(this->renderer_, x, y);
 				}
 			}
@@ -142,7 +144,7 @@ void Renderer::drawLine2D(const Line2D &line) const
 	}
 }
 
-void Renderer::drawCircle(const Circle& circle) const
+void Renderer::drawCircle(const Circle &circle) const
 {
 	this->setDrawColor(circle.color);
 
@@ -151,16 +153,38 @@ void Renderer::drawCircle(const Circle& circle) const
 	{
 		// Vector describing the radius to draw
 		Vector2D r = Vector2D::fromPolar(degreesToRadians(deg), circle.radius); // Next radius to draw
-		Vector2D endPoint = circle.center + r; // Endpoint is center point + vector described by the current radius being drawn
+		Vector2D endPoint = circle.center + r;									// Endpoint is center point + vector described by the current radius being drawn
 		if (circle.fill)
 		{
 			SDL_RenderDrawLine(this->renderer_, circle.center.x, circle.center.y, endPoint.x, endPoint.y);
 		}
-		else 
+		else
 		{
 			SDL_RenderDrawPoint(this->renderer_, endPoint.x, endPoint.y);
 		}
 	}
+}
+
+void Renderer::drawText(const std::string &text, const Vector2D &position, const std::string &font, int size, Color color) const
+{
+	// TODO: Null checks and exiting
+	TTF_Font *fontStyle = TTF_OpenFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf", size); // Create font style
+	SDL_Color sdlCol = {color.r, color.g, color.b, color.a}; // Create color
+	SDL_Surface *textSurface = TTF_RenderText_Solid(fontStyle, text.c_str(), sdlCol); // Create a surface to render onto
+	SDL_Texture *texture = SDL_CreateTextureFromSurface(this->renderer_, textSurface); // Create a texture containing the text
+
+	// Determine rendered text size
+	int width, height;
+	TTF_SizeText(fontStyle, text.c_str(), &width, &height);
+
+	SDL_Rect textRect = { (int)position.x, (int)position.y, width, height };
+	
+	SDL_RenderCopy(this->renderer_, texture, NULL, &textRect); // Render the textured rectangle
+
+	// Free surface
+	SDL_FreeSurface(textSurface);
+
+	TTF_CloseFont(fontStyle);
 }
 
 void Renderer::render() const

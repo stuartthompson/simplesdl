@@ -88,4 +88,7 @@ void Scene::render(const Renderer& renderer) const
     {
         renderer.drawCircle(*circle);
     }
+
+    // Draw Text
+    renderer.drawText("Hello, World!", Vector2D(200, 200), "/usr/share/fonts/truetype/freefont/FreeSans.ttf", 18, COLOR_CYAN);
 }
