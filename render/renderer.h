@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL.h>
+#include <zen-math.h>
 #include "circle.h"
 #include "line2d.h"
 #include "point2d.h"
@@ -44,6 +45,17 @@ public:
      * @param circle The circle to draw.
      */
     void drawCircle(const Circle& circle) const;
+
+    /**
+     * Draws text.
+     * 
+     * @param text The text to draw.
+     * @param position The position at which to draw the text.
+     * @param font The name of the font.
+     * @param size The font size.
+     * @param color The font color.
+     */
+    void drawText(const std::string& text, const Vector2D& position, const std::string& font, int size, Color color) const;
 
     /**
      * Renders contents of render buffer to the screen.

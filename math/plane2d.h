@@ -63,6 +63,14 @@ public:
      */
     Vector2D end() const;
 
+    /**
+     * Tests if this plane intersects with another plane.
+     * 
+     * @param plane The plane to test for intersection.
+     * @return True if the planes intersect.
+     */
+    bool intersects(const Plane2D& plane) const;
+
 private:
     Vector2D start_;
     Vector2D end_;

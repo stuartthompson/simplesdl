@@ -99,3 +99,23 @@ float Vector2D::distanceFrom(const Vector2D& vector) const {
     Vector2D diff = *this - vector;
     return diff.magnitude();
 }
+
+Vector2D::Orientation Vector2D::orientation(const Vector2D& p, const Vector2D& q, const Vector2D& r)
+{
+    int slopeDiff = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+    if (slopeDiff == 0) 
+    {
+        // No slope difference so points line on same plane
+        return Colinear;
+    }
+    else if (slopeDiff > 0)
+    {
+        // Positive slope difference implies right-turns between points so clockwise
+        return Clockwise;
+    }
+    else 
+    {
+        // Negative slope difference implies left-turns between points so anti-clockwise.
+        return AntiClockwise;
+    }
+}
