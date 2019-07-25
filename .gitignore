@@ -1,8 +1,5 @@
 # Build output
 build
 
-# VSCode Configuration Files
-.vscode
-
 # Symbols
 *.dSYM

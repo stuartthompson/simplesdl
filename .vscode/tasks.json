@@ -1,0 +1,84 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Clean",
+            "type": "shell",
+            "command": "rm",
+            "args": [
+                "-rf",
+                "${workspaceRoot}/build"
+            ]
+        },
+        {
+            "label": "CreateBuildDir",
+            "type": "shell",
+            "command": "mkdir",
+            "args": [
+                "${workspaceRoot}/build"
+            ]
+        },
+        {
+            "label": "Build",
+            "type": "shell",
+            "dependsOn": [
+                "Clean",
+                "CreateBuildDir"
+            ],
+            "command": "g++",
+            "osx": {
+                "args": [
+                    "main.cpp",
+                    "math/*.cpp",
+                    "render/*.cpp",
+                    "-g",
+                    "-D_THREAD_SAFE",
+                    "-Imath",
+                    "-Irender",
+                    "-I/usr/local/include/SDL2",
+                    "-L/usr/local/lib",
+                    "-lSDL2",
+                    "-lSDL2_ttf",
+                    "-std=c++17",
+                    "-o",
+                    "build/zen"
+                ]
+            },
+            "linux": {
+                "args": [
+                    "main.cpp",
+                    "math/*.cpp",
+                    "render/*.cpp",
+                    "-g",
+                    "-D_REENTRANT",
+                    "-Imath",
+                    "-Irender",
+                    "-I/usr/include/SDL2",
+                    "-lSDL2",
+                    "-lSDL2_ttf",
+                    "-std=c++17",
+                    "-o",
+                    "build/zen"
+                ]
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "type": "shell",
+            "label": "g++ build active file",
+            "command": "/usr/bin/g++",
+            "args": [
+                "-g",
+                "${file}",
+                "-o",
+                "${fileDirname}/${fileBasenameNoExtension}"
+            ],
+            "options": {
+                "cwd": "/usr/bin"
+            }
+        }
+    ]
+}
