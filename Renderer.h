@@ -3,6 +3,7 @@
 #include <SDL.h>
 #include "Circle.h"
 #include "Plane2D.h"
+#include "Point2D.h"
 
 class Renderer
 {
@@ -22,6 +23,13 @@ public:
      * @param color The color to set.
      */
     void setDrawColor(const Color& color) const;
+
+    /**
+     * Draws a point to the render buffer.
+     * 
+     * @param point The point to draw.
+     */
+    void drawPoint(const Point2D& point) const;
 
     /**
      * Draws a 2D plane to the render buffer.
@@ -44,7 +52,5 @@ public:
     void render() const;
 
 private:
-    SDL_Color toSDLColor(const Color& color) const;
-    
     SDL_Renderer* renderer_;
 };
