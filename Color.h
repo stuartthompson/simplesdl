@@ -1,8 +1,12 @@
 #pragma once
 
+#include <SDL.h>
+
 struct Color
 {
     unsigned char r, g, b, a;
+
+    SDL_Color toSDLColor() const { return { r, g, b, a }; }
 };
 
 

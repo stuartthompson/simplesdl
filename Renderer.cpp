@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Angle.h"
+#include "Point2D.h"
 #include "Renderer.h"
 
 Renderer::Renderer(SDL_Renderer *renderer)
@@ -9,9 +10,8 @@ Renderer::Renderer(SDL_Renderer *renderer)
 
 void Renderer::clearScreen(const Color& color) const
 {
-	// Clear screen
-	this->setDrawColor(color);
-	SDL_RenderClear(this->renderer_);
+	this->setDrawColor(color); // Set screen clear color
+	SDL_RenderClear(this->renderer_); // Clear screen
 }
 
 void Renderer::setDrawColor(const Color& color) const
@@ -19,9 +19,15 @@ void Renderer::setDrawColor(const Color& color) const
 	SDL_SetRenderDrawColor(this->renderer_, color.r, color.g, color.b, color.a);
 }
 
+void Renderer::drawPoint(const Point2D& point) const 
+{
+	this->setDrawColor(point.color);
+	SDL_RenderDrawPoint(this->renderer_, point.location.x, point.location.y);
+}
+
 void Renderer::drawPlane2D(const Plane2D &plane, Color color) const
 {
-	SDL_SetRenderDrawColor(this->renderer_, color.r, color.g, color.b, color.a);
+	this->setDrawColor(color);
 
 	Vector2D from = plane.start();
 	Vector2D to = plane.end();
@@ -161,9 +167,4 @@ void Renderer::drawCircle(const Circle& circle) const
 void Renderer::render() const
 {
 	SDL_RenderPresent(this->renderer_);
-}
-
-SDL_Color Renderer::toSDLColor(const Color& color) const 
-{
-	return SDL_Color({color.r, color.g, color.b, color.a});
 }

@@ -2,10 +2,12 @@
 #include <stdio.h>
 #include <cstdlib>
 #include <chrono>
+#include <string>
 #include "Angle.h"
 #include "Circle.h"
 #include "Color.h"
 #include "Renderer.h"
+#include "Scene.h"
 #include "Vector2D.h"
 
 // Screen dimension constants
@@ -125,6 +127,14 @@ void renderFrame(const Renderer& renderer, int currentTime)
 	renderer.render();
 }
 
+void drawScene(const Renderer& renderer, const std::string& sceneName)
+{
+	Scene scene = Scene();
+	scene.load(sceneName);
+
+	scene.render(renderer);
+}
+
 uint64_t timeSinceEpochMillisec() {
   using namespace std::chrono;
   return duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
@@ -187,7 +197,13 @@ int main(int argc, char *args[])
 				}
 
 				// Render current frame
-				renderFrame(*renderer, currentTime);
+				//renderFrame(*renderer, currentTime);
+
+				// Draw test scene
+				drawScene(*renderer, "SinglePoint");
+
+				// Render
+				renderer->render();
 
 				// Check for input
 				while (SDL_PollEvent(&event))
