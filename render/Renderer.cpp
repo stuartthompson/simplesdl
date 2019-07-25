@@ -1,6 +1,5 @@
 #include <iostream>
-#include "Angle.h"
-#include "Point2D.h"
+#include "../math/math.h"
 #include "Renderer.h"
 
 Renderer::Renderer(SDL_Renderer *renderer)

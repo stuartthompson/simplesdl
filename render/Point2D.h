@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../math/math.h"
 #include "Color.h"
-#include "Vector2D.h"
 
 struct Point2D
 {
