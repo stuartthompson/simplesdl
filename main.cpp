@@ -3,43 +3,19 @@
 #include <cstdlib>
 #include <chrono>
 #include <string>
-#include "Angle.h"
-#include "Circle.h"
-#include "Color.h"
-#include "Renderer.h"
-#include "Scene.h"
-#include "Vector2D.h"
+#include "math/math.h"
+#include "render/Circle.h"
+#include "render/Color.h"
+#include "render/Renderer.h"
+#include "render/Scene.h"
 
 // Screen dimension constants
 const int SCREEN_WIDTH = 800;
 const int SCREEN_HEIGHT = 600;
 
-// calculates the end-point of a vector expressed as an origin, angle, and magnitude
-Vector2D calcEndpoint(Vector2D origin, float angle, float magnitude)
-{
-	// Given the angle and hypotenuse, calculate the height and width of the triangle
-	// sin(angle) = width / hypotenuse (soh)      therefore: width = hypotenuse * sin(angle)
-	// cos(angle) = width / hypotenuse (cah)      therefore: height = hypotenuse * cos(angle)
-
-	// Degrees to radians is    rad = deg * (PI/180)
-	float angleInRadians = degreesToRadians(angle);
-
-	float width = magnitude * sin(angleInRadians);
-	float height = magnitude * cos(angleInRadians);
-
-	return {origin.x + (int)width, origin.y + (int)height};
-}
-
-float calcLineLength(Vector2D from, Vector2D to)
-{
-	// c = sqrt(a^2 + b^2)   (pythagorean theorem)
-	float dx = std::abs(from.x - to.x);
-	float dy = std::abs(from.y - to.y);
-	return sqrt(dx * dx + dy * dy);
-}
-
 void renderUsingTexture(SDL_Renderer *renderer, SDL_Texture *texture)
 {
+	// TODO: Archive this technique in case I need it later
 	Uint32 *pixel;
 	Uint32 *pixels = nullptr;
 	int pitch = 0;
@@ -115,6 +91,7 @@ int main(int argc, char *args[])
 		SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, &window, &sdlRenderer);
 
 		// Create a texture to draw to slope
+		// TODO: Archive this
 		texture =
 			SDL_CreateTexture(
 				sdlRenderer,

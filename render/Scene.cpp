@@ -1,5 +1,5 @@
 #include <string>
-#include "Angle.h"
+#include "../math/math.h"
 #include "Point2D.h"
 #include "Renderer.h"
 #include "Scene.h"

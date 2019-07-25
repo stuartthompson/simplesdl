@@ -3,10 +3,9 @@
 #include <string>
 #include <SDL.h>
 #include <vector>
+#include "../math/math.h"
 #include "Circle.h"
-#include "Plane2D.h"
 #include "Point2D.h"
-#include "Vector2D.h"
 
 class Scene {
 public:

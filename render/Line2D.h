@@ -1,7 +1,7 @@
 #pragma once
 
+#include "../math/math.h"
 #include "Color.h"
-#include "Plane2D.h"
 
 struct Line2D
 {
