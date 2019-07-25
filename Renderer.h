@@ -2,7 +2,7 @@
 
 #include <SDL.h>
 #include "Circle.h"
-#include "Plane2D.h"
+#include "Line2D.h"
 #include "Point2D.h"
 
 class Renderer
@@ -25,19 +25,18 @@ public:
     void setDrawColor(const Color& color) const;
 
     /**
-     * Draws a point to the render buffer.
+     * Draws a 2D point to the render buffer.
      * 
      * @param point The point to draw.
      */
-    void drawPoint(const Point2D& point) const;
+    void drawPoint2D(const Point2D& point) const;
 
     /**
-     * Draws a 2D plane to the render buffer.
+     * Draws a 2D line to the render buffer.
      * 
-     * @param plane The plane to render.
-     * @param color The color to use to render the plane.
+     * @param line The line to render.
      */
-    void drawPlane2D(const Plane2D& plane, Color color) const;
+    void drawLine2D(const Line2D& line) const;
     
     /**
      * Draws a circle to the render buffer.

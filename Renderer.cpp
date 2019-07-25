@@ -19,18 +19,18 @@ void Renderer::setDrawColor(const Color& color) const
 	SDL_SetRenderDrawColor(this->renderer_, color.r, color.g, color.b, color.a);
 }
 
-void Renderer::drawPoint(const Point2D& point) const 
+void Renderer::drawPoint2D(const Point2D& point) const 
 {
 	this->setDrawColor(point.color);
 	SDL_RenderDrawPoint(this->renderer_, point.location.x, point.location.y);
 }
 
-void Renderer::drawPlane2D(const Plane2D &plane, Color color) const
+void Renderer::drawLine2D(const Line2D &line) const
 {
-	this->setDrawColor(color);
+	this->setDrawColor(line.color);
 
-	Vector2D from = plane.start();
-	Vector2D to = plane.end();
+	Vector2D from = line.plane.start();
+	Vector2D to = line.plane.end();
 
 	// Figure out whether x or y is covering more distance (i.e is the slope more horizontal or vertical)
 	float dx = from.x - to.x;
