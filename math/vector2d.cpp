@@ -99,6 +99,9 @@ float Vector2D::direction() const
         }
     }
 
+    // TODO: Quads matter here. Think about how the angle is affected in bottom-left.
+    // Think carefully. Measuring from -y axis going left flips the o and a of the tri.
+
     // sohcahtoa - so tan(a) = o/a  ==>  atan(y/x);
     return atan(this->y / this->x);
 }
