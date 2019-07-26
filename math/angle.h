@@ -2,8 +2,8 @@
 
 #include <math.h>
 
-const float M_PI_OVER_180 = M_PI / 180;
-const float M_180_OVER_PI = 180 / M_PI;
+const double M_PI_OVER_180 = M_PI / 180;
+const double M_180_OVER_PI = 180 / M_PI;
 
 /**
  * Converts degrees to radians.

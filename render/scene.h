@@ -9,7 +9,7 @@
 
 class Scene {
 public:
-    void load(const std::string& sceneName);
+    void load(const std::string& sceneName, int currentTime);
     void render(const Renderer& renderer) const;
 
 private:

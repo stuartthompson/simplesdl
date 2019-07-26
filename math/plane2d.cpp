@@ -30,16 +30,30 @@ Plane2D::Plane2D(const Vector2D& start, const float angle, const float length)
 
 float Plane2D::angle() const
 {
-    // Return the angle of the sum of the vectors describing the plane
-    Vector2D sum = this->start_ + this->end_;
-    return sum.direction();
+    // Return angle of end vector from start vector (i.e. angle of vector connecting the two points)
+    Vector2D diff = this->end_ - this->start_;
+    return diff.direction();
 }
 
 float Plane2D::length() const
 {
-    // Return the length of the sum of the vectors describing the plane
-    Vector2D sum = this->start_ + this->end_;
-    return sum.magnitude();
+    // Return the length of the difference of the vectors describing the plane
+    Vector2D difference = this->end_ - this->start_;
+    return difference.magnitude();
+}
+
+float Plane2D::slope() const
+{
+    Vector2D planeVector = this->end_ - this->start_; // Translate vector of plane to origin
+
+    // Determine the slope of the line (i.e. vector 3,9 has slope 1/3 (or y/x == 9/3))
+	float slope = 0;
+	if (planeVector.x != 0 && planeVector.y != 0)
+	{
+		slope = planeVector.y / planeVector.x;
+	}
+
+    return slope;
 }
 
 Vector2D Plane2D::start() const 
@@ -50,4 +64,27 @@ Vector2D Plane2D::start() const
 Vector2D Plane2D::end() const
 {
     return this->end_;
+}
+
+Vector2D Plane2D::midpoint() const
+{
+    float midx;
+    if (this->start_.x > this->end_.x)
+    {
+        midx = (this->start_.x - this->end_.x) / 2;
+    }
+    else
+    {
+        midx = (this->end_.x - this->start_.x) / 2;
+    }
+    float midy; 
+    if (this->start_.y > this->end_.y)
+    {
+        midy = (this->start_.y - this->end_.y) / 2;
+    }
+    else
+    {
+        midy = (this->end_.y - this->start_.y) / 2;
+    }
+    return Vector2D(midx, midy);
 }

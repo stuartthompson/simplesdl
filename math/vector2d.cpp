@@ -1,4 +1,6 @@
 #include <math.h>
+#include <iostream>
+#include "angle.h"
 #include "vector2d.h"
 
 // @DefaultConstructor
@@ -84,6 +86,19 @@ Vector2D Vector2D::operator/(const Vector2D& vector) const {
 
 float Vector2D::direction() const
 {
+    // When x is 0 then angle is either pi/2 (90) or 3pi/2 (270)
+    if (this->x == 0)
+    {
+        if (this->y > 0)
+        {
+            return M_PI / 2; // Vector is pointing straight up 
+        }
+        else
+        {   
+            return (3 * M_PI) / 2; // Vector is pointing straight down
+        }
+    }
+
     // sohcahtoa - so tan(a) = o/a  ==>  atan(y/x);
     return atan(this->y / this->x);
 }

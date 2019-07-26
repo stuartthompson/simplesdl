@@ -1,12 +1,30 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
+#include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <zen-math.h>
 #include "renderer.h"
 
 Renderer::Renderer(SDL_Renderer *renderer)
 {
 	this->renderer_ = renderer;
+
+	TTF_Init();
+
+	// Initialize fonts
+	this->fontFreeSans_ = TTF_OpenFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf", 18); // FreeSans 18
+	this->fontDejavu_ = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuMathTeXGyre.ttf", 14);   // DejaVu 18
+}
+
+Renderer::~Renderer()
+{
+	// Close fonts
+	TTF_CloseFont(this->fontFreeSans_);
+	TTF_CloseFont(this->fontDejavu_);
+
+	// Quit TTF
+	TTF_Quit();
 }
 
 void Renderer::clearScreen(const Color &color) const
@@ -36,6 +54,8 @@ void Renderer::drawLine2D(const Line2D &line) const
 	// Figure out whether x or y is covering more distance (i.e is the slope more horizontal or vertical)
 	float dx = from.x - to.x;
 	float dy = from.y - to.y;
+
+	float slope = line.plane.slope();
 
 	// Determine the slope of the line (i.e. vector 3,9 has slope 1/3 (or y/x == 9/3))
 	float x, y;
@@ -79,9 +99,6 @@ void Renderer::drawLine2D(const Line2D &line) const
 	// Sloped line
 	else
 	{
-		// Determine the slope of the line (i.e. vector 3,9 has slope 1/3 (or y/x == 9/3))
-		float slope = dy / dx;
-
 		// Draw more than one segment per x-pixel if slope is greater than 1 or less than -1 (fills in near-vertical lines)
 		float xInc = 1;
 		if (slope > 1)
@@ -142,6 +159,17 @@ void Renderer::drawLine2D(const Line2D &line) const
 			}
 		}
 	}
+
+	// Draw slope text (if requested)
+	if (line.showProps) 
+	{
+		// Determine midpoint of line
+		std::stringstream stream;
+		stream << std::fixed << std::setprecision(1) << line.plane.length() << " [" << slope << "]" << " (" << radiansToDegrees(line.plane.angle()) << ")";
+		std::string text = stream.str();
+		Vector2D textLocation = line.plane.start();
+		this->drawText(text, textLocation, Renderer::DejaVu, COLOR_CYAN, radiansToDegrees(line.plane.angle()));
+	}
 }
 
 void Renderer::drawCircle(const Circle &circle) const
@@ -165,26 +193,33 @@ void Renderer::drawCircle(const Circle &circle) const
 	}
 }
 
-void Renderer::drawText(const std::string &text, const Vector2D &position, const std::string &font, int size, Color color) const
+void Renderer::drawText(const std::string &text, const Vector2D &position, const Renderer::Font &font, Color color, const double rotation) const
 {
 	// TODO: Null checks and exiting
-	TTF_Font *fontStyle = TTF_OpenFont("/usr/share/fonts/truetype/freefont/FreeSans.ttf", size); // Create font style
-	SDL_Color sdlCol = {color.r, color.g, color.b, color.a}; // Create color
-	SDL_Surface *textSurface = TTF_RenderText_Solid(fontStyle, text.c_str(), sdlCol); // Create a surface to render onto
-	SDL_Texture *texture = SDL_CreateTextureFromSurface(this->renderer_, textSurface); // Create a texture containing the text
+	TTF_Font *fontStyle;
+	if (font == FreeSans)
+	{
+		fontStyle = this->fontFreeSans_;
+	}
+	else
+	{
+		fontStyle = this->fontDejavu_;
+	}
+	SDL_Color sdlCol = {color.r, color.g, color.b, color.a};									 // Create color
+	SDL_Surface *textSurface = TTF_RenderText_Blended(fontStyle, text.c_str(), sdlCol);			 // Create a surface to render onto
+	SDL_Texture *texture = SDL_CreateTextureFromSurface(this->renderer_, textSurface);			 // Create a texture containing the text
 
 	// Determine rendered text size
 	int width, height;
 	TTF_SizeText(fontStyle, text.c_str(), &width, &height);
 
-	SDL_Rect textRect = { (int)position.x, (int)position.y, width, height };
-	
-	SDL_RenderCopy(this->renderer_, texture, NULL, &textRect); // Render the textured rectangle
+	SDL_Rect textRect = {(int)position.x, (int)position.y, width, height};
+
+	SDL_Point rotatePoint = {0, 0};
+	SDL_RenderCopyEx(this->renderer_, texture, NULL, &textRect, rotation, &rotatePoint, SDL_FLIP_NONE); // Render the textured rectangle
 
 	// Free surface
 	SDL_FreeSurface(textSurface);
-
-	TTF_CloseFont(fontStyle);
 }
 
 void Renderer::render() const

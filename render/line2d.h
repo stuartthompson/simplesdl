@@ -7,4 +7,5 @@ struct Line2D
 {
     Plane2D plane;
     Color color;
+    bool showProps = false;
 };

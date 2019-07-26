@@ -1,15 +1,15 @@
 #include <SDL.h>
-#include <SDL_ttf.h>
 #include <stdio.h>
 #include <cstdlib>
 #include <chrono>
 #include <string>
+#include <map>
 #include <zen-math.h>
 #include <zen-render.h>
 
 // Screen dimension constants
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 600;
+const int SCREEN_WIDTH = 1024;
+const int SCREEN_HEIGHT = 768;
 
 void renderUsingTexture(SDL_Renderer *renderer, SDL_Texture *texture)
 {
@@ -47,10 +47,10 @@ void renderUsingTexture(SDL_Renderer *renderer, SDL_Texture *texture)
 	}
 }
 
-void drawScene(const Renderer& renderer, const std::string& sceneName)
+void drawScene(const Renderer& renderer, const std::string& sceneName, int currentTime)
 {
 	Scene scene = Scene();
-	scene.load(sceneName);
+	scene.load(sceneName, currentTime); // TODO: Replace currentTime with game state
 
 	scene.render(renderer);
 }
@@ -88,9 +88,6 @@ int main(int argc, char *args[])
 		// Create window and get renderer
 		SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, &window, &sdlRenderer);
 
-		// Initialize SDL TTF (for fonts/text rendering)
-		TTF_Init();
-
 		// Create a texture to draw to slope
 		// TODO: Archive this
 		texture =
@@ -120,8 +117,10 @@ int main(int argc, char *args[])
 					lastTick = now;
 				}
 
+				renderer->clearScreen(COLOR_BLACK);
+
 				// Draw test scene
-				drawScene(*renderer, "SinglePoint");
+				drawScene(*renderer, "SinglePoint", currentTime);// TODO: Replace "currentTime" with game state
 
 				// Render
 				renderer->render();
@@ -170,9 +169,6 @@ int main(int argc, char *args[])
 
 			// Destroy window
 			SDL_DestroyWindow(window);
-
-			// Quit SDL ttf
-			TTF_Quit();
 
 			// Quit SDL subsystems
 			SDL_Quit();

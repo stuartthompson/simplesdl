@@ -54,6 +54,11 @@ public:
     float length() const;
 
     /**
+     * Returns the slope of this plane.
+     */
+    float slope() const;
+
+    /**
      * Returns the vector describing the start of this plane.
      */
     Vector2D start() const;
@@ -62,6 +67,11 @@ public:
      * Returns the vector describing the end of this plane.
      */
     Vector2D end() const;
+
+    /**
+     * Returns the midpoint of this plane.
+     */
+    Vector2D midpoint() const;
 
     /**
      * Tests if this plane intersects with another plane.
