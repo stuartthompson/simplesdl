@@ -1,12 +1,11 @@
 # Simple SDL
-Exploring SDL to render simple graphics scenes.
-The primary purpose of this project is to learn more about lower level graphics programming.
+Exploring SDL to render simple graphics scenes. The primary purpose of this project is to learn more about lower level graphics programming.
 
 ## Author
 This software was written by Stuart Thompson in summer of 2019.
-Website: https://www.stuartthompson.net
-Email: stuart@stuartthompson.net
-Twitter: stuartthompson
+ - Website: https://www.stuartthompson.net
+ - Email: stuart@stuartthompson.net
+ - Twitter: stuartthompson
 
 ## License
 This software is distributed under the GNU GPL 3 license. See LICENSE file for full license details.
