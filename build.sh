@@ -1,4 +1,11 @@
-PLATFORM="none"
+PLATFORM=$1
+TASK=$2
+
+# Validate arguments
+if [ "$PLATFORM" != "linux" ] && [ "$PLATFORM" != "osx" ]; then
+    echo "Usage: sh ./build.sh [platform]"
+    exit 0
+fi
 
 # Base-config
 INCDIR=./inc
@@ -8,7 +15,7 @@ BUILDDIR=./build
 OUTPUT=sdltest
 CFLAGS="-std=c++17"
 
-# Linux
+# Set platform-specific variables
 if [ "$1" = "linux" ]; then
     echo "Building for Linux"
     PLATFORM="linux"
@@ -16,18 +23,12 @@ if [ "$1" = "linux" ]; then
     LIB="-L/usr/lib -lSDL2 -lSDL2_ttf -lzenixel"
     CFLAGS="-D_REENTRANT $CFLAGS"
 fi
-# OSX
 if [ "$1" = "osx" ]; then
     echo "Building for OSX"
     PLATFORM="osx"
     INC="-I/usr/local/include/zenixel -I/usr/local/include/SDL2"
     LIB="-L/usr/local/lib -lSDL2 -lSDL2_ttf -lzenixel"
     CFLAGS="-D_THREAD_SAFE $CFLAGS"
-fi
-# Unrecognized
-if [ "$PLATFORM" = "none" ]; then
-    echo "Usage: sh ./build.sh [platform]"
-    exit 0
 fi
 
 # Clean up previous builds
