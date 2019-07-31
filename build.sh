@@ -19,15 +19,15 @@ CFLAGS="-std=c++17"
 if [ "$PLATFORM" == "linux" ]; then
     echo "Targeting Linux"
     PLATFORM="linux"
-    INC="-I/usr/include/zenixel -I/usr/include/SDL2"
-    LIB="-L/usr/lib -lSDL2 -lSDL2_ttf -lzenixel"
+    INC="-I/usr/include/SDL2 -I/usr/local/include/zenixel"
+    LIB="-lSDL2 -lSDL2_ttf -L/usr/local/lib/zenixel -lzenixel"
     CFLAGS="-D_REENTRANT $CFLAGS"
 fi
 if [ "$PLATFORM" == "osx" ]; then
     echo "Targeting OSX"
     PLATFORM="osx"
-    INC="-I/usr/local/include/zenixel -I/usr/local/include/SDL2"
-    LIB="-L/usr/local/lib -lSDL2 -lSDL2_ttf -lzenixel"
+    INC="-I/usr/local/include/SDL2 -I/usr/local/include/zenixel"
+    LIB="-lSDL2 -lSDL2_ttf -L/usr/local/lib/zenixel -lzenixel"
     CFLAGS="-D_THREAD_SAFE $CFLAGS"
 fi
 
