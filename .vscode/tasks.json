@@ -29,36 +29,34 @@
             "osx": {
                 "args": [
                     "main.cpp",
-                    "math/*.cpp",
-                    "render/*.cpp",
                     "-g",
                     "-D_THREAD_SAFE",
-                    "-Imath",
-                    "-Irender",
+                    "-I~/dev/inc/zenixel",
                     "-I/usr/local/include/SDL2",
                     "-L/usr/local/lib",
                     "-lSDL2",
                     "-lSDL2_ttf",
+                    "-L~/dev/lib/zenixel",
+                    "-lzenixel",
                     "-std=c++17",
                     "-o",
-                    "build/zen"
+                    "build/sdltest"
                 ]
             },
             "linux": {
                 "args": [
                     "main.cpp",
-                    "math/*.cpp",
-                    "render/*.cpp",
                     "-g",
                     "-D_REENTRANT",
-                    "-Imath",
-                    "-Irender",
+                    "-I~/dev/inc/zenixel",
                     "-I/usr/include/SDL2",
                     "-lSDL2",
                     "-lSDL2_ttf",
+                    "-L~/dev/lib/zenixel",
+                    "-lzenixel",
                     "-std=c++17",
                     "-o",
-                    "build/zen"
+                    "build/sdltest"
                 ]
             },
             "group": {

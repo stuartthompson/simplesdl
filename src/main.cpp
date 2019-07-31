@@ -4,8 +4,7 @@
 #include <chrono>
 #include <string>
 #include <map>
-#include <zen-math.h>
-#include <zen-render.h>
+#include <zenixel/zenixel.h>
 
 // Screen dimension constants
 const int SCREEN_WIDTH = 1024;
