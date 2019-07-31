@@ -98,7 +98,7 @@ int main(int argc, char *args[])
 				SCREEN_HEIGHT);
 
 		// Create renderer
-		renderer = new Renderer(sdlRenderer);
+		renderer = new Renderer(sdlRenderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 		if (window == NULL)
 		{
