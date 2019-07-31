@@ -31,13 +31,14 @@ if [ "$PLATFORM" == "osx" ]; then
     CFLAGS="-D_THREAD_SAFE $CFLAGS"
 fi
 
-
+# Clean
 if [ "$TASK" == "clean" ] || [ "$TASK" == "" ]; then
     # Clean up previous builds
     echo "Cleaning build output"
     rm -rf $BUILDDIR                                             # Remove build folder
 fi
 
+# Build
 if [ "$TASK" == "build" ] || [ "$TASK" == "" ]; then
     # Create output folder
     echo "Creating build folder"
