@@ -2,80 +2,15 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Clean",
-            "type": "shell",
-            "command": "rm",
-            "args": [
-                "-rf",
-                "${workspaceRoot}/build"
-            ]
-        },
-        {
-            "label": "CreateBuildDir",
-            "type": "shell",
-            "command": "mkdir",
-            "args": [
-                "${workspaceRoot}/build"
-            ]
-        },
-        {
             "label": "Build",
             "type": "shell",
-            "dependsOn": [
-                "Clean",
-                "CreateBuildDir"
+            "command": "sh",
+            "args": [
+                "./build.sh"
             ],
-            "command": "g++",
-            "osx": {
-                "args": [
-                    "main.cpp",
-                    "-g",
-                    "-D_THREAD_SAFE",
-                    "-I~/dev/inc/zenixel",
-                    "-I/usr/local/include/SDL2",
-                    "-L/usr/local/lib",
-                    "-lSDL2",
-                    "-lSDL2_ttf",
-                    "-L~/dev/lib/zenixel",
-                    "-lzenixel",
-                    "-std=c++17",
-                    "-o",
-                    "build/sdltest"
-                ]
-            },
-            "linux": {
-                "args": [
-                    "main.cpp",
-                    "-g",
-                    "-D_REENTRANT",
-                    "-I~/dev/inc/zenixel",
-                    "-I/usr/include/SDL2",
-                    "-lSDL2",
-                    "-lSDL2_ttf",
-                    "-L~/dev/lib/zenixel",
-                    "-lzenixel",
-                    "-std=c++17",
-                    "-o",
-                    "build/sdltest"
-                ]
-            },
             "group": {
                 "kind": "build",
                 "isDefault": true
-            }
-        },
-        {
-            "type": "shell",
-            "label": "g++ build active file",
-            "command": "/usr/bin/g++",
-            "args": [
-                "-g",
-                "${file}",
-                "-o",
-                "${fileDirname}/${fileBasenameNoExtension}"
-            ],
-            "options": {
-                "cwd": "/usr/bin"
             }
         }
     ]
